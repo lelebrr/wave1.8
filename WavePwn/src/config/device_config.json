@@ -1,0 +1,9 @@
+{
+  "device_name": "CyberGuard Pro",
+  "assistant": "alexa",
+  "language": "pt-BR",
+  "theme": "dark",
+  "owner": "Seu Nome",
+  "enable_voice_alerts": true,
+  "neura9_sensitivity": 0.78
+}

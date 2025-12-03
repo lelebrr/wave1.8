@@ -6,23 +6,25 @@
 #include <WebSocketsServer.h>
 #include <Update.h>
 
+#include "utils/ota_secure.h"
+
 #include "pwnagotchi.h"
 #include "ai/neura9_inference.h"
 
 extern bool lab_mode;
 
 // Arquivos embutidos no firmware (PlatformIO board_build.embed_files)
-extern const uint8_t data_index_html_start[] asm("_binary_data_index_html_start");
-extern const uint8_t data_index_html_end[]   asm("_binary_data_index_html_end");
+extern const uint8_t data_web_index_html_start[] asm("_binary_data_web_index_html_start");
+extern const uint8_t data_web_index_html_end[]   asm("_binary_data_web_index_html_end");
 
-extern const uint8_t data_style_css_start[]  asm("_binary_data_style_css_start");
-extern const uint8_t data_style_css_end[]    asm("_binary_data_style_css_end");
+extern const uint8_t data_web_style_css_start[]  asm("_binary_data_web_style_css_start");
+extern const uint8_t data_web_style_css_end[]    asm("_binary_data_web_style_css_end");
 
-extern const uint8_t data_chart_min_js_start[] asm("_binary_data_chart_min_js_start");
-extern const uint8_t data_chart_min_js_end[]   asm("_binary_data_chart_min_js_end");
+extern const uint8_t data_web_chart_min_js_start[] asm("_binary_data_web_chart_min_js_start");
+extern const uint8_t data_web_chart_min_js_end[]   asm("_binary_data_web_chart_min_js_end");
 
-extern const uint8_t data_favicon_ico_start[] asm("_binary_data_favicon_ico_start");
-extern const uint8_t data_favicon_ico_end[]   asm("_binary_data_favicon_ico_end");
+extern const uint8_t data_web_favicon_ico_start[] asm("_binary_data_web_favicon_ico_start");
+extern const uint8_t data_web_favicon_ico_end[]   asm("_binary_data_web_favicon_ico_end");
 
 extern const uint8_t ota_update_html_start[]  asm("_binary_ota_update_html_start");
 extern const uint8_t ota_update_html_end[]    asm("_binary_ota_update_html_end");
@@ -83,7 +85,7 @@ static String format_uptime(uint32_t seconds) {
 // -----------------------------------------------------------------------------
 
 static void handle_root() {
-    serve_embedded(data_index_html_start, data_index_html_end, "text/html");
+    serve_embedded(data_web_index_html_start, data_web_index_html_end, "text/html");
 }
 
 static void handle_index() {
@@ -91,15 +93,15 @@ static void handle_index() {
 }
 
 static void handle_style() {
-    serve_embedded(data_style_css_start, data_style_css_end, "text/css");
+    serve_embedded(data_web_style_css_start, data_web_style_css_end, "text/css");
 }
 
 static void handle_chart() {
-    serve_embedded(data_chart_min_js_start, data_chart_min_js_end, "application/javascript");
+    serve_embedded(data_web_chart_min_js_start, data_web_chart_min_js_end, "application/javascript");
 }
 
 static void handle_favicon() {
-    serve_embedded(data_favicon_ico_start, data_favicon_ico_end, "image/x-icon");
+    serve_embedded(data_web_favicon_ico_start, data_web_favicon_ico_end, "image/x-icon");
 }
 
 static bool ensure_ota_auth() {
@@ -121,18 +123,18 @@ static void handle_ota_upload() {
     HTTPUpload& upload = http_server.upload();
     if (upload.status == UPLOAD_FILE_START) {
         log_line("[OTA] Iniciando update: " + String(upload.filename.c_str()));
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
-            Update.printError(Serial);
+        if (!ota_begin_secure(UPDATE_SIZE_UNKNOWN)) {
+            log_line("[OTA] Falha ao iniciar buffer OTA seguro");
         }
     } else if (upload.status == UPLOAD_FILE_WRITE) {
-        if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-            Update.printError(Serial);
+        if (!ota_write_chunk(upload.buf, upload.currentSize)) {
+            log_line("[OTA] Erro ao escrever chunk OTA");
         }
     } else if (upload.status == UPLOAD_FILE_END) {
-        if (Update.end(true)) {
+        if (ota_finalize(true)) {
             log_line("[OTA] Update concluído com sucesso, reiniciando...");
         } else {
-            Update.printError(Serial);
+            log_line("[OTA] Falha ao finalizar OTA");
         }
     }
 }

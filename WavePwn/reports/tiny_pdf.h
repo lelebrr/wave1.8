@@ -68,5 +68,6 @@ inline void generate_report() {
     pdf.text(20, 30, "WAVE PWN v2 - Relatorio de Seguranca");
     pdf.text(20, 50, String("Handshakes capturados: ") + String(pwn.handshakes));
     pdf.text(20, 70, String("Ameacas detectadas: ") + String(threat_count));
+    pdf.text(20, 90, String("Bateria: ") + String(pwn.battery_percent, 0) + "%");
     (void)pdf.save(path);
 }

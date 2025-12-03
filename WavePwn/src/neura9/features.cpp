@@ -1,4 +1,4 @@
-#include "neura9_inference.h"
+#include "inference.h"
 
 // Este arquivo existe para permitir futura extração de features mais rica
 // (por exemplo, estatísticas detalhadas do sniffer, IMU, RTC, etc.).
