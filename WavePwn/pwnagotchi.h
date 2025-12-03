@@ -39,13 +39,20 @@ public:
     uint32_t deauths = 0;
 
     // Estado de ambiente para NEURA9
-    float    battery_percent = 100.0f;
-    bool     is_charging     = false;
-    bool     is_moving       = false;
-    uint8_t  current_channel = 0;
+    float    battery_percent   = 100.0f;
+    bool     is_charging       = false;
+    bool     is_moving         = false;
+    uint8_t  current_channel   = 0;
+    uint8_t  threat_level      = 0;
+    float    threat_confidence = 0.0f;
+
+    // Modo ZUMBI – funcionamento ultra-econômico
+    void enterZombieMode();
 
 private:
     LGFX lcd;
+    bool in_zombie_mode = false;
+
     void initDisplay();
     void initSD();
     void initWiFiMonitor();

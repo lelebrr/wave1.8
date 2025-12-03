@@ -1,16 +1,339 @@
-<!--
-  index.html - Interface web futura do WavePwn (OTA, logs via Wi-Fi)
--->
-
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <title>WavePwn Web UI</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1>WavePwn</h1>
-    <p>Interface web em construção.</p>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAVE PWN v2 — NEURA9 DEFENSIVE GRID</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico">
+  <script src="chart.min.js"></script>
+</head>
+<body>
+  <div class="glow-bg"></div>
+  <div class="scanlines"></div>
+
+  <div class="container">
+    <header class="header">
+      <div class="title-wrap">
+        <h1>WAVE PWN <span class="tag">v2</span></h1>
+        <span id="status" class="status-pill online">● ONLINE</span>
+      </div>
+      <div class="sub">
+        <span class="badge">NEURA9 DEFENSIVE AI</span>
+        <span class="badge">BLE PWNGRID</span>
+        <span class="badge">HASHCAT-READY CAPTURE</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="left">
+        <div class="grid">
+          <div class="card">
+            <h3>Uptime</h3>
+            <p id="uptime" class="metric">00:00:00</p>
+            <span class="caption">tempo desde o boot</span>
+          </div>
+          <div class="card">
+            <h3>Bateria</h3>
+            <p id="battery" class="metric">100%</p>
+            <div class="bar">
+              <div id="battery-bar" class="bar-fill" style="width:100%"></div>
+            </div>
+            <span class="caption">modo ZUMBI abaixo de 1%</span>
+          </div>
+          <div class="card">
+            <h3>Redes Vistas</h3>
+            <p id="aps" class="metric">0</p>
+            <span class="caption">beacons / probe responses únicos</span>
+          </div>
+          <div class="card">
+            <h3>Handshakes</h3>
+            <p id="hs" class="metric">0</p>
+            <span class="caption">WPA2 4-way capturados</span>
+          </div>
+          <div class="card">
+            <h3>PMKID</h3>
+            <p id="pmkid" class="metric">0</p>
+            <span class="caption">hashcat -m 16800 pronto</span>
+          </div>
+          <div class="card">
+            <h3>NEURA9</h3>
+            <p id="ai" class="metric ai-safe">SAFE</p>
+            <span class="caption" id="ai-caption">IA local defensiva</span>
+          </div>
+        </div>
+
+        <div class="canvas-wrap">
+          <div class="canvas-header">
+            <span>Threat Level Timeline</span>
+            <span id="threat-badge" class="threat-badge safe">SAFE</span>
+          </div>
+          <canvas id="chartThreats"></canvas>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="logs">
+          <div class="logs-header">
+            <span>Event log</span>
+            <span id="log-counter" class="logs-counter">0 eventos</span>
+          </div>
+          <pre id="log" class="logs-body"></pre>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" onclick="location.href='/ota/update.html'">
+            OTA UPDATE
+          </button>
+          <button class="btn ghost" onclick="window.location.reload()">
+            RELOAD DASHBOARD
+          </button>
+        </div>
+
+        <div class="footer">
+          <span>WAVE PWN v2 · Defesa Wi‑Fi portátil · 100% ética</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+  const threatLabels = [
+    "SAFE",
+    "CROWDED",
+    "OPEN_NETWORK",
+    "EVIL_TWIN_RISK",
+    "DEAUTH_DETECTED",
+    "ROGUE_AP",
+    "HIGH_RISK",
+    "BATTERY_CRITICAL",
+    "GESTURE_COMMAND",
+    "LEARNING_MODE"
+  ];
+
+  let ws;
+  let reconnectTimer;
+  let logCount = 0;
+
+  const statusEl = document.getElementById('status');
+  const uptimeEl = document.getElementById('uptime');
+  const batteryEl = document.getElementById('battery');
+  const batteryBarEl = document.getElementById('battery-bar');
+  const apsEl = document.getElementById('aps');
+  const hsEl = document.getElementById('hs');
+  const pmkidEl = document.getElementById('pmkid');
+  const aiEl = document.getElementById('ai');
+  const aiCaptionEl = document.getElementById('ai-caption');
+  const logEl = document.getElementById('log');
+  const logCounterEl = document.getElementById('log-counter');
+  const threatBadgeEl = document.getElementById('threat-badge');
+
+  function formatUptime(seconds) {
+    seconds = Number(seconds) || 0;
+    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  function setStatus(online) {
+    statusEl.classList.toggle('online', online);
+    statusEl.classList.toggle('offline', !online);
+    statusEl.textContent = online ? '● ONLINE' : '● OFFLINE';
+  }
+
+  function updateBatteryBar(level) {
+    const clamped = Math.max(0, Math.min(100, level));
+    batteryBarEl.style.width = clamped + '%';
+
+    batteryBarEl.classList.remove('lvl-ok', 'lvl-mid', 'lvl-low', 'lvl-critical');
+    if (clamped > 40) batteryBarEl.classList.add('lvl-ok');
+    else if (clamped > 20) batteryBarEl.classList.add('lvl-mid');
+    else if (clamped > 5) batteryBarEl.classList.add('lvl-low');
+    else batteryBarEl.classList.add('lvl-critical');
+  }
+
+  function updateAI(label) {
+    const idx = threatLabels.indexOf(label);
+    aiEl.textContent = label;
+
+    aiEl.classList.remove('ai-safe', 'ai-warn', 'ai-danger');
+    threatBadgeEl.classList.remove('safe', 'warn', 'danger');
+
+    if (idx <= 0) {
+      aiEl.classList.add('ai-safe');
+      threatBadgeEl.classList.add('safe');
+      aiCaptionEl.textContent = 'ambiente estável';
+    } else if (idx <= 3) {
+      aiEl.classList.add('ai-warn');
+      threatBadgeEl.classList.add('warn');
+      aiCaptionEl.textContent = 'atenção: anomalias leves';
+    } else if (idx <= 6) {
+      aiEl.classList.add('ai-danger');
+      threatBadgeEl.classList.add('danger');
+      aiCaptionEl.textContent = 'risco elevado detectado';
+    } else if (idx === 7) {
+      aiEl.classList.add('ai-danger');
+      threatBadgeEl.classList.add('danger');
+      aiCaptionEl.textContent = 'bateria crítica — preparando MODO ZUMBI';
+    } else {
+      aiEl.classList.add('ai-warn');
+      threatBadgeEl.classList.add('warn');
+      aiCaptionEl.textContent = 'modo especial / aprendizado';
+    }
+
+    threatBadgeEl.textContent = label;
+    pushThreatPoint(idx < 0 ? 0 : idx);
+  }
+
+  // ---- Chart.js ----
+  const threatCtx = document.getElementById('chartThreats').getContext('2d');
+  const chartData = {
+    labels: [],
+    datasets: [{
+      label: 'Threat Level',
+      data: [],
+      borderColor: '#22d3ee',
+      backgroundColor: 'rgba(34,211,238,0.15)',
+      tension: 0.35,
+      fill: true,
+      pointRadius: 0,
+      borderWidth: 2
+    }]
+  };
+
+  const chartThreats = new Chart(threatCtx, {
+    type: 'line',
+    data: chartData,
+    options: {
+      animation: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const idx = ctx.parsed.y | 0;
+              const label = threatLabels[idx] || 'SAFE';
+              return ` ${label} (nível ${idx})`;
+            }
+          }
+        }
+      },
+      layout: {
+        padding: { left: 4, right: 4, top: 8, bottom: 4 }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#9ca3af', maxRotation: 0, autoSkip: true },
+          grid: { color: 'rgba(31,41,55,0.7)' }
+        },
+        y: {
+          min: 0,
+          max: 9,
+          ticks: {
+            stepSize: 1,
+            color: '#9ca3af',
+            callback: (v) => v
+          },
+          grid: { color: 'rgba(31,41,55,0.7)' }
+        }
+      }
+    }
+  });
+
+  function pushThreatPoint(level) {
+    const now = new Date();
+    const label = now.toLocaleTimeString('pt-BR', { hour12: false });
+    chartData.labels.push(label);
+    chartData.datasets[0].data.push(level);
+
+    const maxPoints = 60;
+    if (chartData.labels.length > maxPoints) {
+      chartData.labels.shift();
+      chartData.datasets[0].data.shift();
+    }
+    chartThreats.update('none');
+  }
+
+  // ---- Logs ----
+  function appendLog(line) {
+    if (!line) return;
+    logCount++;
+    logCounterEl.textContent = logCount + ' eventos';
+    const atBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 8;
+    logEl.textContent += line + '\n';
+    if (logEl.textContent.length > 8000) {
+      logEl.textContent = logEl.textContent.slice(-8000);
+    }
+    if (atBottom) {
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  }
+
+  // ---- WebSocket ----
+  function connectWS() {
+    try {
+      ws = new WebSocket('ws://' + location.hostname + ':81');
+    } catch (e) {
+      setStatus(false);
+      scheduleReconnect();
+      return;
+    }
+
+    ws.onopen = () => {
+      setStatus(true);
+      appendLog('[WS] Conectado ao WAVE PWN');
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+    };
+
+    ws.onclose = () => {
+      setStatus(false);
+      appendLog('[WS] Desconectado — tentando novamente...');
+      scheduleReconnect();
+    };
+
+    ws.onerror = () => {
+      setStatus(false);
+      scheduleReconnect();
+    };
+
+    ws.onmessage = (e) => {
+      try {
+        const d = JSON.parse(e.data);
+        if (typeof d.uptime !== 'undefined') {
+          uptimeEl.innerText = typeof d.uptime === 'number'
+            ? formatUptime(d.uptime)
+            : d.uptime;
+        }
+        if (typeof d.battery !== 'undefined') {
+          const b = Number(d.battery) || 0;
+          batteryEl.innerText = b.toFixed(0) + '%';
+          updateBatteryBar(b);
+        }
+        if (typeof d.aps !== 'undefined') apsEl.innerText = d.aps;
+        if (typeof d.hs !== 'undefined') hsEl.innerText = d.hs;
+        if (typeof d.pmkid !== 'undefined') pmkidEl.innerText = d.pmkid;
+        if (typeof d.ai !== 'undefined') updateAI(d.ai);
+        if (typeof d.log !== 'undefined') appendLog(d.log);
+      } catch (err) {
+        console.error('WS parse error', err);
+      }
+    };
+  }
+
+  function scheduleReconnect() {
+    if (reconnectTimer) return;
+    reconnectTimer = setTimeout(connectWS, 3000);
+  }
+
+  window.addEventListener('load', () => {
+    connectWS();
+  });
+</script>
+</body>
 </html>

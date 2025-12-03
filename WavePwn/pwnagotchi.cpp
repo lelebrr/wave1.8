@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <SD.h>
 #include <esp_wifi.h>
+#include <esp_sleep.h>
 
 #include "pwnagotchi.h"
 #include "ui.h"
@@ -12,6 +13,8 @@
 #include "audio.h"
 #include "capture.h"
 #include "ai/neura9_inference.h"
+#include "src/webserver.h"
+#include "ble_grid/pwn_grid.h"
 
 // -----------------------------------------------------------------------------
 // Implementação mínima do wrapper LGFX (por enquanto, apenas loga no Serial).
@@ -78,6 +81,12 @@ void Pwnagotchi::begin() {
         Serial.println("[NEURA9] Falha ao inicializar IA defensiva (modo stub)");
     }
 
+    // BLE PwnGrid cooperativo
+    pwnGrid.begin();
+
+    // Webserver + WebSocket + OTA seguro
+    webserver_start();
+
     Serial.println("WAVE PWN PRONTO PARA DOMINAR");
 }
 
@@ -85,11 +94,17 @@ void Pwnagotchi::update() {
     // Uptimes simples em segundos (aprox.)
     uptime = millis() / 1000;
 
-    // Placeholders de ambiente (até integrar sensores reais)
-    current_channel  = 0;
-    battery_percent  = 100.0f;
-    is_charging      = false;
-    is_moving        = false;
+    // Placeholders de ambiente (até integrar sensores reais reais).
+    // Estes valores podem ser sobrescritos por sensores.cpp quando existirem.
+    if (battery_percent <= 0.0f || battery_percent > 100.0f) {
+        battery_percent = 100.0f;
+    }
+
+    // Modo ZUMBI: se a bateria entrar em estado crítico, reduz ao mínimo
+    if (!in_zombie_mode && battery_percent <= 1.0f) {
+        enterZombieMode();
+        return;
+    }
 
     ui_update_stats(
         aps_seen,
@@ -101,18 +116,28 @@ void Pwnagotchi::update() {
         is_moving
     );
 
-    // NEURA9 avalia o ambiente periodicamente
+    // NEURA9 avalia o ambiente periodicamente (HUD + PwnGrid)
     static uint32_t last_ai = 0;
     uint32_t now = millis();
     if (now - last_ai > 800) {
         uint8_t cls = neura9.predict();
         float conf  = neura9.get_confidence();
-        (void)cls;
-        (void)conf;
-        // Futuro: exibir classe/confiança na HUD; por enquanto apenas log.
-        Serial.printf("[NEURA9] classe=%u conf=%.2f\n", cls, conf);
+        threat_level = cls;
+        threat_confidence = conf;
+
+        Serial.printf("[NEURA9] classe=%u (%s) conf=%.2f\n",
+                      cls,
+                      NEURA9_THREAT_LABELS[cls],
+                      conf);
+
         last_ai = now;
+
+        // Compartilha nível de ameaça com a PwnGrid cooperativa
+        pwnGrid.share_threat_level(cls);
     }
+
+    // Web dashboard em tempo real
+    webserver_send_stats();
 
     // Deixa o LVGL rodar a UI
     lv_timer_handler();
@@ -148,10 +173,30 @@ void Pwnagotchi::initSD() {
 }
 
 void Pwnagotchi::initWiFiMonitor() {
-    Serial.println("[WavePwn] initWiFiMonitor() - configurando Wi-Fi em modo promíscuo");
+    Serial.println("[WavePwn] initWiFiMonitor() - configurando Wi-Fi em modo promíscuo + AP");
 
-    WiFi.mode(WIFI_MODE_STA);
+    // Modo AP+STA permite sniffar e, ao mesmo tempo, expor o dashboard web.
+    WiFi.mode(WIFI_MODE_APSTA);
     WiFi.disconnect(true, true);
+
+    // SoftAP local para o dashboard / OTA (sem acesso à Internet por padrão).
+#ifdef PET_NAME
+    const char* ap_ssid = PET_NAME;
+#else
+    const char* ap_ssid = "WavePwn";
+#endif
+    const char* ap_pass = "wavepwn";
+
+    bool ap_ok = WiFi.softAP(ap_ssid, ap_pass);
+    if (ap_ok) {
+        IPAddress ip = WiFi.softAPIP();
+        Serial.printf("[WavePwn] AP '%s' ativo em %s (senha: %s)\n",
+                      ap_ssid,
+                      ip.toString().c_str(),
+                      ap_pass);
+    } else {
+        Serial.println("[WavePwn] Falha ao iniciar SoftAP");
+    }
 
     // Filtro: apenas management + data (onde estão beacons, probe resp, EAPOL, etc.)
     wifi_promiscuous_filter_t filter = {};
@@ -187,4 +232,39 @@ void Pwnagotchi::showBootAnimation() {
     lcd.setCursor(20, 120);
     lcd.println("O Pwnagotchi Renascido");
     delay(2000);
+}
+
+// -----------------------------------------------------------------------------
+// Modo ZUMBI — funciona até com 1% de bateria
+// -----------------------------------------------------------------------------
+void Pwnagotchi::enterZombieMode() {
+    if (in_zombie_mode) return;
+    in_zombie_mode = true;
+
+    Serial.println("[ZUMBI] Entrando em modo ZUMBI (ultra low-power)");
+
+    // Brilho mínimo no display físico
+    lcd.setBrightness(5);
+
+    // Esconde a UI LVGL, mas mantém a estrutura para futuros wake-ups.
+    lv_obj_add_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
+
+    // Acorda a cada 30s apenas para checar ameaças com a NEURA9.
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+    esp_sleep_enable_timer_wakeup(30000000ULL); // 30 segundos em micros
+
+    while (true) {
+        // Ainda protege mesmo dormindo: a IA defensiva roda e atualiza o nível.
+        uint8_t cls = neura9.predict();
+        threat_level = cls;
+        threat_confidence = neura9.get_confidence();
+
+        Serial.printf("[ZUMBI] Tick - classe=%u (%s) conf=%.2f\n",
+                      cls,
+                      NEURA9_THREAT_LABELS[cls],
+                      threat_confidence);
+
+        // Dorme profundamente até o próximo tick; o resto do sistema fica em paz.
+        esp_light_sleep_start();
+    }
 }
