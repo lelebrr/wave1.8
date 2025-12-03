@@ -1,0 +1,33 @@
+/* Tema dark principal do WavePwn (LVGL + dashboard web) */
+
+:root {
+    --bg-color: #050510;
+    --bg-alt:   #101020;
+    --fg-color: #00ffff;
+    --accent:   #ff00ff;
+    --danger:   #ff3366;
+    --ok:       #00ffaa;
+    --text-muted: #8080a0;
+    --border-color: #00ffff;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--fg-color);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.card {
+    background: #080818;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+button {
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+}

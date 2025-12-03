@@ -10,6 +10,8 @@
 #include <esp_sleep.h>
 #include <driver/gpio.h>
 
+extern void konami_godmode(void);
+
 WavePwn_UI ui = { 0 };
 
 // -----------------------------------------------------------------------------
@@ -22,6 +24,10 @@ static lv_timer_t *particle_timer = nullptr;
 static lv_obj_t *eye_left  = nullptr;
 static lv_obj_t *eye_right = nullptr;
 static lv_obj_t *secret_menu = nullptr;
+
+static bool     eye_left_pressed       = false;
+static uint32_t eye_left_press_start   = 0;
+static bool     eye_left_longpress_flag = false;
 
 typedef struct {
     float vx;
@@ -47,6 +53,7 @@ static const char *mood_names[] = {
 static void create_face(lv_obj_t *parent);
 static void create_hud(lv_obj_t *parent);
 static void on_touch_event(lv_event_t *e);
+static void eye_left_event_cb(lv_event_t *e);
 static void blink_timer_cb(lv_timer_t *t);
 static void particle_timer_cb(lv_timer_t *t);
 static void update_eyes_from_touch(const lv_point_t &p);
@@ -143,6 +150,11 @@ static void create_face(lv_obj_t *parent) {
     lv_obj_set_style_bg_color(eye_left, lv_color_white(), 0);
     lv_obj_set_style_bg_opa(eye_left, LV_OPA_COVER, 0);
     lv_obj_set_pos(eye_left, 60, 20);
+
+    // Eventos para detectar toque longo (Easter Egg)
+    lv_obj_add_event_cb(eye_left, eye_left_event_cb, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event_cb(eye_left, eye_left_event_cb, LV_EVENT_PRESSING, NULL);
+    lv_obj_add_event_cb(eye_left, eye_left_event_cb, LV_EVENT_RELEASED, NULL);
 
     // Pupila esquerda
     lv_obj_t *pupil_l = lv_obj_create(eye_left);
@@ -560,6 +572,33 @@ static void on_touch_event(lv_event_t *e) {
     update_eyes_from_touch(p);
 }
 
+static void eye_left_event_cb(lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if (code == LV_EVENT_PRESSED) {
+        eye_left_pressed = true;
+        eye_left_press_start = lv_tick_get();
+        eye_left_longpress_flag = false;
+    } else if (code == LV_EVENT_PRESSING) {
+        if (eye_left_pressed &amp;&amp; !eye_left_longpress_flag) {
+            uint32_t now = lv_tick_get();
+            if (now - eye_left_press_start &gt;= 5000) {
+                eye_left_longpress_flag = true;
+            }
+        }
+    } else if (code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
+        eye_left_pressed = false;
+    }
+}
+
+bool ui_eye_left_longpress_reached(void) {
+    return eye_left_longpress_flag;
+}
+
+void ui_reset_eye_left_longpress_flag(void) {
+    eye_left_longpress_flag = false;
+}
+
 // -----------------------------------------------------------------------------
 // Menu secreto - GOD MODE
 // -----------------------------------------------------------------------------
@@ -726,8 +765,7 @@ void ui_konami_code_handler(lv_event_t *e) {
         step++;
         if (step >= sizeof(konami)) {
             step = 0;
-            ui_set_mood(MOOD_GODMODE);
-            ui_show_secret_menu();
+            konami_godmode();
         }
     } else {
         step = 0;

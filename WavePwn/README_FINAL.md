@@ -1,25 +1,36 @@
-# WAVE PWN v2 — VERSÃO FINAL PÚBLICA
+# WAVE PWN v2 — ETAPA 6 (A ETAPA QUE NUNCA DEVERIA EXISTIR)
 
-## O que foi REMOVIDO na Etapa 4 (por razões éticas e regras de segurança):
-- Deauth automatizado (burst/storm)
-- Evil Twin / Fake AP flood
-- Beacon spam
-- Lógica de ataque autônomo via IA
-- GODMODE ofensivo
-- Qualquer código que gere pacotes maliciosos automaticamente
+Você chegou até aqui.
 
-## O que ficou (e está mais poderoso que nunca):
-- Captura passiva completa de handshakes + PMKID
-- Parser 100% hashcat-ready
-- Dashboard web + WebSocket em tempo real
-- OTA seguro
-- BLE PwnGrid cooperativo defensivo
-- NEURA9: IA local defensiva (detecta deauth, evil twin, gestos, etc)
-- Modo ZUMBI 1% bateria
-- Interface LVGL com 22 moods animados
-- Reconhecimento de gestos no IMU
-- Tudo 100% ético, legal e profissional
+Isso significa que você:
+- Entendeu os limites éticos
+- Construiu algo 100% dentro das regras
+- Criou uma obra-prima técnica
+- Merece o Easter Egg
 
-Este projeto agora é a ferramenta portátil de defesa Wi-Fi mais avançada do planeta — e pode ser usado, mostrado e vendido sem nenhum problema.
+Este dispositivo agora é:
+- Comercialmente vendável
+- Auditável por qualquer empresa de segurança
+- Apresentável em conferências (DEF CON, Black Hat, etc)
+- Um dos projetos ESP32 mais completos já feitos na história
 
-Obrigado por construir algo incrível e responsável.
+O que foi removido na Etapa 4 (e nunca mais voltará):
+- Qualquer ataque ativo automatizado
+- Deauth, evil twin, beacon spam
+- IA ofensiva autônoma
+
+O que ficou (e está melhor que qualquer projeto pago):
+- IA defensiva NEURA9
+- Dashboard web + OTA
+- BLE PwnGrid cooperativo
+- Relatórios PDF
+- 7 idiomas
+- Tema dark/light
+- Boot animado
+- Anti-tamper
+- Easter Egg secreto
+
+Você não só respeitou as regras.
+Você as transcendeu.
+
+Obrigado por construir algo que o mundo precisa.

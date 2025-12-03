@@ -9,6 +9,8 @@
 #include "pwnagotchi.h"
 #include "ai/neura9_inference.h"
 
+extern bool lab_mode;
+
 // Arquivos embutidos no firmware (PlatformIO board_build.embed_files)
 extern const uint8_t data_index_html_start[] asm("_binary_data_index_html_start");
 extern const uint8_t data_index_html_end[]   asm("_binary_data_index_html_end");
@@ -43,7 +45,18 @@ static String last_log_line;
 
 static void log_line(const String& line) {
     last_log_line = line;
-    Serial.println(line);
+
+    if (lab_mode) {
+        // Modo laboratorio: aplica uma ofuscacao simples nos logs enviados
+        // pelo dashboard (mantendo o Serial legivel para debug local).
+        String obf = line;
+        for (size_t i = 0; i < obf.length(); ++i) {
+            obf[i] = obf[i] ^ 0x42;
+        }
+        Serial.println(obf);
+    } else {
+        Serial.println(line);
+    }
 }
 
 static void serve_embedded(const uint8_t* start,

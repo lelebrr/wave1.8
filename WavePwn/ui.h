@@ -82,6 +82,10 @@ void ui_update_stats(uint32_t aps,
                      bool moving);
 void ui_konami_code_handler(lv_event_t *e);
 
+// Flag usada pelo Easter Egg: indica se houve toque de 5s no olho esquerdo.
+bool ui_eye_left_longpress_reached(void);
+void ui_reset_eye_left_longpress_flag(void);
+
 #ifdef __cplusplus
 }
 #endif
