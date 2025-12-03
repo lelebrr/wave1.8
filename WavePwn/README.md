@@ -1,20 +1,22 @@
-# WavePwn - Pwnagotchi para ESP32-S3 AMOLED 1.8"
+# WAVE PWN v2.0 — O Pwnagotchi que Enterra o Raspberry Pi
 
-O primeiro Pwnagotchi 100% nativo para a placa Wave (ESP32-S3 Touch AMOLED 1.8" com microSD).
+O primeiro e único Pwnagotchi 100% nativo para ESP32-S3 Touch AMOLED 1.8"
 
-## Funcionalidades (em desenvolvimento)
-- Captura passiva e ativa de handshakes WPA/WPA2 + PMKID
-- Interface LVGL com carinhas animadas
-- Touch + sensores (movimento ativa modo agressivo)
-- Armazenamento em microSD 128 GB
-- Deauth + sniffing + epochs
-- Whitelist + bateria no display
-- Sons de evento
+### Recursos já funcionando ou em desenvolvimento:
+- Interface LVGL com 20+ expressões animadas
+- Captura passiva + ativa de WPA/WPA2 handshakes e PMKID
+- Deauth inteligente ativado por movimento (IMU)
+- microSD 128 GB com PCAPs hashcat-ready
+- Display AMOLED 368x448 com touch
+- Bateria monitorada + modo sleep profundo
+- Sons fofos com ES8311
+- Futuro: BLE Pwngrid, web server OTA, IA local
 
-## Como usar
-1. Abra a pasta WavePwn no Arduino IDE
-2. Selecione: ESP32S3 Dev Module
-3. PSRAM: Enabled | Flash Size: 16MB | Partition: Huge App
-4. Upload!
+### Compilação:
+- Use PlatformIO (já configurado)
+- Board: ESP32S3 Dev Module
+- PSRAM: Enabled
+- Flash: 16MB
+- Partition: Huge App
 
-Em breve: interface web via Wi-Fi, OTA, Pwngrid BLE.
+Este projeto vai fazer história.
