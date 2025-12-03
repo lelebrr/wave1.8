@@ -7,7 +7,12 @@
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
-#include "tensorflow/lite/version.h"
+
+// Some TFLM ports (e.g. Chirale_TensorFlowLite) define TFLITE_SCHEMA_VERSION
+// inside micro_interpreter.h and don't ship tensorflow/lite/version.h.
+#ifndef TFLITE_SCHEMA_VERSION
+#define TFLITE_SCHEMA_VERSION 3
+#endif
 
 // Encapsula a IA defensiva local NEURA9.
 class Neura9 {
