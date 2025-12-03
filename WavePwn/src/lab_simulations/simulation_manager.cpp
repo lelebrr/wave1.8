@@ -190,3 +190,71 @@ void SimulationManager::bluetooth_spam_sim(const char* profile_name) {
   snprintf(details, sizeof(details), "profile=%s", safe_profile);
   lab_log_event("bluetooth_spam_sim", details);
 }
+
+void SimulationManager::pmkid_flood_sim(const char* ap_label, int frames) {
+  if (!is_lab_mode_enabled()) {
+    lab_warn_mode_off("pmkid_flood_sim");
+    return;
+  }
+
+  const char* safe_label = ap_label ? ap_label : "(null)";
+
+  Serial.printf(
+      "[LAB][SIM] PMKID flood (SIMULACAO) alvo='%s' frames=%d "
+      "(nenhum frame PMKID real enviado)\n",
+      safe_label,
+      frames);
+
+  ui_set_mood(MOOD_PMKID);
+  lab_show_banner("SIMULACAO PMKID (SEM FRAMES REAIS)");
+
+  char details[160];
+  snprintf(details, sizeof(details), "target=%s;frames=%d", safe_label, frames);
+  lab_log_event("pmkid_flood_sim", details);
+}
+
+void SimulationManager::bluetooth_jammer_sim(int duration_seconds) {
+  if (!is_lab_mode_enabled()) {
+    lab_warn_mode_off("bluetooth_jammer_sim");
+    return;
+  }
+
+  if (duration_seconds < 0) {
+    duration_seconds = 0;
+  }
+
+  Serial.printf(
+      "[LAB][SIM] Bluetooth jammer (SIMULACAO) duracao=%ds "
+      "(nenhuma interferencia real gerada)\n",
+      duration_seconds);
+
+  ui_set_mood(MOOD_WIFI_OFF);
+  lab_show_banner("SIMULACAO BT JAMMER (SEM INTERFERENCIA)");
+
+  char details[64];
+  snprintf(details, sizeof(details), "duration=%d", duration_seconds);
+  lab_log_event("bluetooth_jammer_sim", details);
+}
+
+void SimulationManager::bluetooth_inquiry_flood_sim(int duration_seconds) {
+  if (!is_lab_mode_enabled()) {
+    lab_warn_mode_off("bluetooth_inquiry_flood_sim");
+    return;
+  }
+
+  if (duration_seconds < 0) {
+    duration_seconds = 0;
+  }
+
+  Serial.printf(
+      "[LAB][SIM] Bluetooth inquiry flood (SIMULACAO) duracao=%ds "
+      "(nenhuma inquiry real enviada)\n",
+      duration_seconds);
+
+  ui_set_mood(MOOD_SCANNING);
+  lab_show_banner("SIMULACAO INQUIRY (SEM SCAN REAL)");
+
+  char details[64];
+  snprintf(details, sizeof(details), "duration=%d", duration_seconds);
+  lab_log_event("bluetooth_inquiry_flood_sim", details);
+}
