@@ -1,5 +1,4 @@
 #pragma once
-#include <LovyanGFX.hpp>
 #include <lvgl.h>
 #include <stdint.h>
 
@@ -22,6 +21,9 @@ public:
     void setTextSize(uint8_t size);
     void setCursor(int16_t x, int16_t y);
     void println(const char *text);
+
+    // Placeholder para controle de brilho (compatível com futura LovyanGFX real)
+    void setBrightness(uint8_t value);
 };
 
 class Pwnagotchi {

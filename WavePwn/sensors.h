@@ -4,4 +4,5 @@
 
 #pragma once
 
-// Futuras declarações relacionadas aos sensores da placa Wave.
+// Wake por movimento (IMU QMI8658) + outros sensores
+void init_motion_wakeup(void);

@@ -39,6 +39,11 @@ void LGFX::println(const char *text) {
     Serial.println(text);
 }
 
+void LGFX::setBrightness(uint8_t value) {
+    // Stub: apenas loga. No futuro será mapeado para o PWM do backlight.
+    Serial.printf("[LGFX] setBrightness(%u)\\n", value);
+}
+
 // -----------------------------------------------------------------------------
 // Pwnagotchi - ciclo de vida principal
 // -----------------------------------------------------------------------------
@@ -57,7 +62,17 @@ void Pwnagotchi::update() {
     // Uptimes simples em segundos (aprox.)
     uptime = millis() / 1000;
 
-    // Futuro: atualizar stats de redes, handshakes, PMKID etc.
+    // Por enquanto usamos valores fictícios; nas próximas etapas estes virão
+    // do sniffer Wi-Fi, IMU e monitoramento de bateria real.
+    ui_update_stats(
+        aps_seen,
+        handshakes,
+        pmkids,
+        deauths,
+        0,          // canal atual (placeholder)
+        100.0f,     // bateria em % (placeholder)
+        false       // movimento detectado (placeholder)
+    );
 
     // Deixa o LVGL rodar a UI
     lv_timer_handler();
@@ -83,8 +98,8 @@ void Pwnagotchi::initWiFiMonitor() {
 }
 
 void Pwnagotchi::initSensors() {
-    // Futuro: inicializar QMI8658, AXP2101, PCF85063 e mapear para humor/estados.
-    Serial.println("[WavePwn] initSensors() - stub inicial");
+    Serial.println("[WavePwn] initSensors() - inicializando sensores básicos");
+    init_motion_wakeup();
 }
 
 // -----------------------------------------------------------------------------
