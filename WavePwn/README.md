@@ -43,6 +43,22 @@ O primeiro e único Pwnagotchi 100% nativo para ESP32-S3 Touch AMOLED 1.8"
 - Pipeline completo para treinar/atualizar o modelo no PC (Python + TFLite)
 - Estrutura pronta para integrar IMU, RTC e métricas avançadas
 
+## MÓDULO DE SIMULAÇÃO ACADÊMICA (Etapa 8)
+Contém simulações didáticas de:
+- Deauthentication attacks (simulados)
+- Evil Twin / Rogue AP (simulados)
+- Beacon spam (simulado)
+- NFC replay (simulado)
+- Bluetooth spam (simulado)
+- MouseJack simulation (conceitual)
+- e mais cenários extensíveis
+
+STATUS: 100% DESATIVADO por padrão  
+Ativação: criar manualmente o arquivo `/sd/.enable_lab_attacks`  
+Uso: apenas em laboratório isolado com autorização escrita. Nenhuma rotina
+de simulação envia tráfego malicioso real; tudo é registrado em `/sd/lab_logs/`
+e sinalizado na UI como **SIMULAÇÃO**.
+
 ### Compilação:
 - Use PlatformIO (já configurado)
 - Board: ESP32S3 Dev Module

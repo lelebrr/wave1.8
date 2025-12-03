@@ -289,6 +289,7 @@ void Pwnagotchi::initSD() {
     SD.mkdir("/sd/wavepwn/session");
     SD.mkdir("/sd/lang");
     SD.mkdir("/sd/reports");
+    SD.mkdir("/sd/lab_logs");
 
     Serial.println("[WavePwn] microSD pronto para captura de handshakes");
 }
