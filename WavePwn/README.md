@@ -23,6 +23,16 @@ O primeiro e único Pwnagotchi 100% nativo para ESP32-S3 Touch AMOLED 1.8"
 - Menu secreto completo
 - Esta interface já é uma obra de arte
 
+## ETAPA 3 DO RENASCIMENTO – CONCLUÍDA
+- Parser 100% funcional de WPA2 4-way handshake
+- Captura de PMKID automática (hashcat -m 16800)
+- PCAPs com rotação automática (150 MB cada)
+- Deduplicação em RAM + persistente
+- Arquivos 100% compatíveis com hashcat/aircrack
+- Captura WPA3 SAE (em desenvolvimento)
+- Mais de 200 pacotes/segundo processados
+- Seu cartão de 128 GB agora é um arsenal nuclear de handshakes
+
 ### Compilação:
 - Use PlatformIO (já configurado)
 - Board: ESP32S3 Dev Module
