@@ -1,0 +1,11 @@
+{
+  "language": "ru-RU",
+  "strings": {
+    "report_title": "WAVE PWN v2 - Отчёт по безопасности",
+    "report_handshakes": "Захваченные handshakes",
+    "report_threats": "Обнаруженные угрозы",
+    "secret_title": "РЕЖИМ БОГА АКТИВИРОВАН",
+    "secret_body": "Код Konami принят.\nБудущие функции:\n- Секретный разгон\n- Продвинутые твики\n- Зашифрованный лабораторный режим",
+    "secret_back": "Назад"
+  }
+}

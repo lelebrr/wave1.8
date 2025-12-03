@@ -1,0 +1,11 @@
+{
+  "language": "de-DE",
+  "strings": {
+    "report_title": "WAVE PWN v2 - Sicherheitsbericht",
+    "report_handshakes": "Erfasste Handshakes",
+    "report_threats": "Erkannte Bedrohungen",
+    "secret_title": "GOTT-MODUS FREIGESCHALTET",
+    "secret_body": "Konami-Code akzeptiert.\nZukünftige Funktionen hier:\n- Geheimer Overclock\n- Erweiterte Tweaks\n- Verschlüsselter Labor-Modus",
+    "secret_back": "Zurück"
+  }
+}

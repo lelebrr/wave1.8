@@ -1,0 +1,11 @@
+{
+  "language": "ja-JP",
+  "strings": {
+    "report_title": "WAVE PWN v2 - セキュリティレポート",
+    "report_handshakes": "取得したハンドシェイク",
+    "report_threats": "検出された脅威",
+    "secret_title": "GOD MODE 解放",
+    "secret_body": "コナミコマンドが認識されました。\n今後の機能:\n- シークレットオーバークロック\n- 高度なチューニング\n- 暗号化ラボモード",
+    "secret_back": "戻る"
+  }
+}

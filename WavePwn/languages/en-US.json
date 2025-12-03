@@ -1,0 +1,11 @@
+{
+  "language": "en-US",
+  "strings": {
+    "report_title": "WAVE PWN v2 - Security Report",
+    "report_handshakes": "Captured handshakes",
+    "report_threats": "Detected threats",
+    "secret_title": "GOD MODE UNLOCKED",
+    "secret_body": "Konami code accepted.\nFuture features here:\n- Secret overclock\n- Advanced tweaks\n- Encrypted lab mode",
+    "secret_back": "Back"
+  }
+}

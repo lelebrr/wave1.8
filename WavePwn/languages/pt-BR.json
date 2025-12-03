@@ -1,0 +1,11 @@
+{
+  "language": "pt-BR",
+  "strings": {
+    "report_title": "WAVE PWN v2 - Relatório de Segurança",
+    "report_handshakes": "Handshakes capturados",
+    "report_threats": "Ameaças detectadas",
+    "secret_title": "GOD MODE DESBLOQUEADO",
+    "secret_body": "Konami code aceito.\nFunções futuras aqui:\n- Overclock secreto\n- Tweaks avançados\n- Modo laboratório criptografado",
+    "secret_back": "Voltar"
+  }
+}

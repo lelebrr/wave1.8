@@ -3,6 +3,7 @@
 #include <SD.h>
 #include <esp_wifi.h>
 #include <esp_sleep.h>
+#include <ArduinoJson.h>
 
 #include "pwnagotchi.h"
 #include "ui.h"
@@ -15,6 +16,82 @@
 #include "ai/neura9_inference.h"
 #include "src/webserver.h"
 #include "ble_grid/pwn_grid.h"
+#include "anti_tamper/secure_boot.h"
+#include "reports/tiny_pdf.h"
+
+uint32_t threat_count = 0;
+
+// -----------------------------------------------------------------------------
+// Tema dark/light - aplica tema global na tela ativa do LVGL.
+// -----------------------------------------------------------------------------
+void switch_theme(bool dark) {
+    lv_obj_t *scr = lv_scr_act();
+    if (!scr) return;
+
+    if (dark) {
+        lv_obj_set_style_bg_color(scr, lv_color_black(), 0);
+        lv_obj_set_style_text_color(scr, lv_color_hex(0x00FFFF), 0);
+    } else {
+        lv_obj_set_style_bg_color(scr, lv_color_hex(0xF0F0F0), 0);
+        lv_obj_set_style_text_color(scr, lv_color_hex(0x000000), 0);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Carregamento de idioma via JSON no microSD com fallback.
+// Espera arquivos em /sd/lang/<lang>.json (ex: /sd/lang/pt-BR.json).
+// -----------------------------------------------------------------------------
+void load_language(const char* lang) {
+    if (!lang) return;
+
+    String path = "/sd/lang/";
+    path += lang;
+    path += ".json";
+
+    File f = SD.open(path.c_str());
+    if (!f) {
+        Serial.printf("[LANG] Falha ao abrir %s\n", path.c_str());
+        if (strcmp(lang, "en-US") != 0) {
+            load_language("en-US");
+        }
+        return;
+    }
+
+    StaticJsonDocument<1024> doc;
+    DeserializationError err = deserializeJson(doc, f);
+    f.close();
+
+    if (err) {
+        Serial.printf("[LANG] Erro ao parsear %s: %s\n",
+                      path.c_str(),
+                      err.c_str());
+        if (strcmp(lang, "en-US") != 0) {
+            load_language("en-US");
+        }
+        return;
+    }
+
+    const char* code = doc["language"] | lang;
+    Serial.printf("[LANG] Idioma carregado: %s (%s)\n", lang, code);
+    // Nesta etapa mantemos o parser como stub; os textos localizados
+    // podem ser ligados aos labels da UI nas próximas evoluções.
+}
+
+// -----------------------------------------------------------------------------
+// Boot premium animado usando LVGL (15 frames ~ 2s).
+// -----------------------------------------------------------------------------
+void show_premium_boot() {
+    lv_obj_t *scr = lv_scr_act();
+    if (!scr || !ui.face) return;
+
+    for (int i = 0; i < 15; i++) {
+        uint8_t v = (uint8_t)((i + 1) * 255 / 15);
+        lv_color_t c = lv_color_make(0, v, 255 - v);
+        lv_obj_set_style_bg_color(ui.face, c, 0);
+        lv_timer_handler();
+        delay(133);  // ~15 FPS → 2s
+    }
+}
 
 // -----------------------------------------------------------------------------
 // Implementação mínima do wrapper LGFX (por enquanto, apenas loga no Serial).
@@ -57,6 +134,9 @@ void LGFX::setBrightness(uint8_t value) {
 // Pwnagotchi - ciclo de vida principal
 // -----------------------------------------------------------------------------
 void Pwnagotchi::begin() {
+    // Proteção anti-tamper / secure boot
+    anti_tamper_check();
+
     initDisplay();
     showBootAnimation();
 
@@ -75,6 +155,11 @@ void Pwnagotchi::begin() {
 
     lv_init();
     ui_init();
+
+    // Tema inicial e idioma padrão
+    switch_theme(true);          // dark por padrão
+    load_language("pt-BR");
+    show_premium_boot();
 
     // Inicializa IA defensiva local (NEURA9)
     if (!neura9.begin()) {
@@ -125,6 +210,10 @@ void Pwnagotchi::update() {
         threat_level = cls;
         threat_confidence = conf;
 
+        if (cls > 0) {
+            threat_count++;
+        }
+
         Serial.printf("[NEURA9] classe=%u (%s) conf=%.2f\n",
                       cls,
                       NEURA9_THREAT_LABELS[cls],
@@ -134,6 +223,15 @@ void Pwnagotchi::update() {
 
         // Compartilha nível de ameaça com a PwnGrid cooperativa
         pwnGrid.share_threat_level(cls);
+    }
+
+    // Tema dark/light automatico simples baseado em tempo de execução
+    static uint32_t last_theme_toggle = 0;
+    static bool theme_dark = true;
+    if (now - last_theme_toggle > 600000) { // a cada 10 minutos
+        theme_dark = !theme_dark;
+        switch_theme(theme_dark);
+        last_theme_toggle = now;
     }
 
     // Web dashboard em tempo real
@@ -168,6 +266,8 @@ void Pwnagotchi::initSD() {
     SD.mkdir("/sd/wavepwn/sae");
     SD.mkdir("/sd/wavepwn/logs");
     SD.mkdir("/sd/wavepwn/session");
+    SD.mkdir("/sd/lang");
+    SD.mkdir("/sd/reports");
 
     Serial.println("[WavePwn] microSD pronto para captura de handshakes");
 }
