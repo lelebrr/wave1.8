@@ -19,6 +19,7 @@
 #include "ble_grid/pwn_grid.h"
 #include "anti_tamper/secure_boot.h"
 #include "reports/tiny_pdf.h"
+#include "assistants/assistant_manager.h"
 
 uint32_t threat_count = 0;
 
@@ -147,6 +148,9 @@ void Pwnagotchi::begin() {
     initSensors();
     initWiFiMonitor();
 
+    // Nome do dispositivo + escolha de assistente (Alexa / Google / ambos / nenhum)
+    assistantManager.begin();
+
     // Callback promíscuo -> motor de captura de handshakes/PMKID
     esp_wifi_set_promiscuous_rx_cb([](void* buf, wifi_promiscuous_pkt_type_t type) {
         (void)type;
@@ -246,6 +250,13 @@ void Pwnagotchi::update() {
 
     // Web dashboard em tempo real
     webserver_send_stats();
+
+    // Envia periodicamente um resumo de status para os assistentes de voz
+    static uint32_t last_voice_status = 0;
+    if (now - last_voice_status > 60000UL) { // a cada 60s
+        assistantManager.send_status();
+        last_voice_status = now;
+    }
 
     // Deixa o LVGL rodar a UI
     lv_timer_handler();

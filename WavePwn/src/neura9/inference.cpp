@@ -1,11 +1,11 @@
-#include "neura9_inference.h"
+#include "inference.h"
 
 #include <cstring>
 
 #include "pwnagotchi.h"
 #include "ui.h"
 #include "sensors.h"
-#include "ai/neura9_defense_model_data.h"
+#include "neura9/model.h"
 
 extern Pwnagotchi pwn;
 

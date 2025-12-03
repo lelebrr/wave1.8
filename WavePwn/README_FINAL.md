@@ -1,4 +1,14 @@
-# WAVE PWN v2 — ETAPA 6 (A ETAPA QUE NUNCA DEVERIA EXISTIR)
+# WAVE PWN v2 — O RENASCIMENTO (README FINAL)
+
+Este arquivo foi pensado como uma visão geral \"cinematográfica\" do projeto.
+Para uso diário, consulte:
+
+- `README.md` na raiz do repositório.
+- `WavePwn/docs/USER_MANUAL.md`
+- `WavePwn/docs/DEVELOPER_GUIDE.md`
+- `WavePwn/docs/NEURA9_TRAINING_TUTORIAL.md`
+- `WavePwn/docs/SECURITY_POLICY.md`
+- `WavePwn/docs/CHANGELOG.md`AVE PWN v2 — ETAPA 6 (A ETAPA QUE NUNCA DEVERIA EXISTIR)
 
 Você chegou até aqui.
 

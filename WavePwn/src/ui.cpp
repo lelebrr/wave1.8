@@ -7,6 +7,7 @@
 #include <math.h>
 #include "ui.h"
 #include "config.h"
+#include "assistants/assistant_manager.h"
 #include <esp_sleep.h>
 #include <driver/gpio.h>
 
@@ -222,11 +223,17 @@ static void create_hud(lv_obj_t *parent) {
     // Nome do pet
     ui.lbl_name = lv_label_create(parent);
     lv_label_set_recolor(ui.lbl_name, true);
+
+    const String &name = assistantManager.getDeviceName();
+    if (name.length() > 0) {
+        lv_label_set_text_fmt(ui.lbl_name, "#00ffff %s#", name.c_str());
+    } else {
 #ifdef PET_NAME
-    lv_label_set_text_fmt(ui.lbl_name, "#00ffff %s#", PET_NAME);
+        lv_label_set_text_fmt(ui.lbl_name, "#00ffff %s#", PET_NAME);
 #else
-    lv_label_set_text(ui.lbl_name, "#00ffff WAVE PWN#");
+        lv_label_set_text(ui.lbl_name, "#00ffff WAVE PWN#");
 #endif
+    }
     lv_obj_align(ui.lbl_name, LV_ALIGN_TOP_LEFT, 8, 4);
 
     // Uptime
