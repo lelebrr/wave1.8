@@ -17,10 +17,16 @@
 class SimulationManager {
 public:
   // Verifica se o modo de laboratório está habilitado.
-  // Implícito: Pwnagotchi::initSD() já inicializou o microSD.
-  static bool is_lab_mode_enabled() {
-    return SD.exists("/sd/.enable_lab_attacks");
-  }
+  // Requer:
+  // - microSD inicializado (Pwnagotchi::initSD()).
+  // - Arquivo /sd/.enable_lab_attacks presente.
+  // - PIN de laboratório desbloqueado na sessão atual.
+  static bool is_lab_mode_enabled();
+
+  // Marca o PIN de laboratório como desbloqueado na sessão atual.
+  // Usado pelo painel web após validação do PIN de 6 dígitos.
+  static void set_lab_unlocked(bool unlocked);
+  static bool is_lab_unlocked();
 
   // Simulações acadêmicas (NÃO enviam pacotes reais).
   // Todas as rotinas devem:
@@ -35,11 +41,15 @@ public:
   static void rogue_ap_sim();
   static void pmkid_flood_sim(const char* ap_label, int frames = 50);
 
-  // NFC (conceitual)
-  static void nfc_replay_sim(const char* profile_name);
+  // Ataques Wi-Fi avançados (sempre como SIMULAÇÃO)
+  static void wps_attack_sim(const uint8_t* ap_mac, uint8_t channel);
+  static void karma_attack_sim(const char* ssid_pattern, uint8_t channel);
+  static void handshake_downgrade_sim(const char* ap_label,
+                                      bool from_wpa3_to_wpa2);
 
   // Bluetooth
   static void bluetooth_spam_sim(const char* profile_name);
   static void bluetooth_jammer_sim(int duration_seconds = 10);
   static void bluetooth_inquiry_flood_sim(int duration_seconds = 10);
+  static void bluetooth_hid_injection_sim(const char* payload);
 };
