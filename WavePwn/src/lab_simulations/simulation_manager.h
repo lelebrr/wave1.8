@@ -27,10 +27,19 @@ public:
   // - Checar is_lab_mode_enabled().
   // - Registrar logs em /sd/lab_logs/.
   // - Exibir na UI um banner claro de "SIMULAÇÃO".
+
+  // Wi-Fi
   static void deauth_burst_sim(uint8_t channel, int packets = 50);
   static void evil_twin_sim(const char* ssid, uint8_t channel);
   static void beacon_spam_sim(int count = 100);
   static void rogue_ap_sim();
+  static void pmkid_flood_sim(const char* ap_label, int frames = 50);
+
+  // NFC (conceitual)
   static void nfc_replay_sim(const char* profile_name);
+
+  // Bluetooth
   static void bluetooth_spam_sim(const char* profile_name);
+  static void bluetooth_jammer_sim(int duration_seconds = 10);
+  static void bluetooth_inquiry_flood_sim(int duration_seconds = 10);
 };

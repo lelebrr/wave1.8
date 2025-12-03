@@ -114,15 +114,25 @@ Diretório:
 
 ```text
 WavePwn/src/lab_simulations/
-├── ATTACK_SIMULATION.md        ← este arquivo (LEITURA OBRIGATÓRIA)
-├── simulation_manager.cpp / .h ← orquestração e checagem de /sd/.enable_lab_attacks
-├── deauth_sim.cpp / .h         ← simulação acadêmica de “deauth burst”
-├── evil_twin_sim.cpp / .h      ← simulação acadêmica de “evil twin”
-├── beacon_spam_sim.cpp / .h    ← simulação acadêmica de “beacon spam”
-├── rogue_ap_sim.cpp / .h       ← simulação acadêmica de “rogue AP”
-├── nfc_replay_sim.cpp          ← simulação acadêmica de cenários NFC
-└── bluetooth_spam_sim.cpp      ← simulação acadêmica de cenários BLE
+├── ATTACK_SIMULATION.md              ← este arquivo (LEITURA OBRIGATÓRIA)
+├── simulation_manager.cpp / .h       ← orquestração e checagem de /sd/.enable_lab_attacks
+├── deauth_sim.cpp / .h               ← base histórica da simulação de “deauth burst”
+├── evil_twin_sim.cpp / .h            ← base histórica da simulação de “evil twin”
+├── beacon_spam_sim.cpp / .h          ← base histórica da simulação de “beacon spam”
+├── rogue_ap_sim.cpp / .h             ← base histórica da simulação de “rogue AP”
+├── nfc_replay_sim.cpp                ← simulação acadêmica de cenários NFC
+├── bluetooth_spam_sim.cpp            ← simulação acadêmica de cenários BLE (spam genérico)
+├── wifi_deauth_sim.cpp / .h          ← wrappers conceituais para simulação Wi‑Fi deauth
+├── wifi_evil_twin_sim.cpp / .h       ← wrappers conceituais para simulação Evil Twin
+├── wifi_beacon_spam_sim.cpp / .h     ← wrappers conceituais para simulação beacon spam
+├── wifi_pmkid_flood_sim.cpp / .h     ← wrappers conceituais para simulação PMKID flood
+├── bluetooth_jammer_sim.cpp / .h     ← wrappers conceituais para simulação BT jammer
+└── bluetooth_inquiry_flood_sim.cpp / .h ← wrappers conceituais para simulação inquiry flood
 ```
+
+Todas estas unidades usam **SimulationManager** como ponto central de lógica.
+Nenhuma delas envia tráfego malicioso real: o comportamento é restrito a logs,
+banners de “SIMULAÇÃO” e métricas sintéticas de laboratório.
 
 Pontos importantes:
 
