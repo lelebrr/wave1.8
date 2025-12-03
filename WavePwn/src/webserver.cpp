@@ -7,6 +7,8 @@
 #include <Update.h>
 #include <SD.h>
 #include <ArduinoJson.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "utils/ota_secure.h"
 
@@ -32,6 +34,9 @@ extern const uint8_t data_web_favicon_ico_end[]   asm("_binary_data_web_favicon_
 
 extern const uint8_t data_web_config_html_start[] asm("_binary_data_web_config_html_start");
 extern const uint8_t data_web_config_html_end[]   asm("_binary_data_web_config_html_end");
+
+extern const uint8_t data_web_config_js_start[] asm("_binary_data_web_config_js_start");
+extern const uint8_t data_web_config_js_end[]   asm("_binary_data_web_config_js_end");
 
 extern const uint8_t ota_update_html_start[]  asm("_binary_ota_update_html_start");
 extern const uint8_t ota_update_html_end[]    asm("_binary_ota_update_html_end");
@@ -104,6 +109,10 @@ static void handle_root() {
 
 static void handle_config_page() {
     serve_embedded(data_web_config_html_start, data_web_config_html_end, "text/html");
+}
+
+static void handle_config_js() {
+    serve_embedded(data_web_config_js_start, data_web_config_js_end, "application/javascript");
 }
 
 static void handle_index() {
@@ -412,7 +421,13 @@ static void handle_ota_result() {
     } else {
         http_server.send(200, "text/plain", "OTA OK, rebooting...");
     }
-    delay(500);
+    vTaskDelay(pdMS_TO_TICKS(500));
+    ESP.restart();
+}
+
+static void handle_reboot() {
+    http_server.send(200, "text/plain", "Rebooting...");
+    vTaskDelay(pdMS_TO_TICKS(200));
     ESP.restart();
 }
 
@@ -458,6 +473,7 @@ void webserver_start() {
     http_server.on("/chart.min.js", HTTP_GET, handle_chart);
     http_server.on("/favicon.ico", HTTP_GET, handle_favicon);
     http_server.on("/config.html", HTTP_GET, handle_config_page);
+    http_server.on("/config.js", HTTP_GET, handle_config_js);
 
     // API de configuração do dispositivo
     http_server.on("/api/config/device", HTTP_GET, handle_api_config_device_get);
@@ -480,6 +496,9 @@ void webserver_start() {
         handle_ota_result,
         handle_ota_upload
     );
+
+    // Reboot simples via Web Config
+    http_server.on("/reboot", HTTP_GET, handle_reboot);
 
     http_server.onNotFound(handle_not_found);
 

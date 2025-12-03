@@ -4,6 +4,8 @@
 #include <esp_wifi.h>
 #include <esp_sleep.h>
 #include <ArduinoJson.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "pwnagotchi.h"
 #include "ui.h"
@@ -91,7 +93,7 @@ void show_premium_boot() {
         lv_color_t c = lv_color_make(0, v, 255 - v);
         lv_obj_set_style_bg_color(ui.face, c, 0);
         lv_timer_handler();
-        delay(133);  // ~15 FPS → 2s
+        vTaskDelay(pdMS_TO_TICKS(133));  // ~15 FPS → 2s
     }
 }
 
@@ -260,7 +262,7 @@ void Pwnagotchi::update() {
 
     // Deixa o LVGL rodar a UI
     lv_timer_handler();
-    delay(5);
+    vTaskDelay(pdMS_TO_TICKS(5));
 }
 
 // -----------------------------------------------------------------------------
@@ -348,12 +350,12 @@ void Pwnagotchi::showBootAnimation() {
     lcd.println("WAVE");
     lcd.setCursor(40, 140);
     lcd.println("PWN");
-    delay(1500);
+    vTaskDelay(pdMS_TO_TICKS(1500));
     lcd.fillScreen(TFT_BLACK);
     lcd.setTextSize(2);
     lcd.setCursor(20, 120);
     lcd.println("O Pwnagotchi Renascido");
-    delay(2000);
+    vTaskDelay(pdMS_TO_TICKS(2000));
 }
 
 // -----------------------------------------------------------------------------

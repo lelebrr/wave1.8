@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <SD.h>
 #include <lvgl.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "pwnagotchi.h"
 #include "ui.h"
@@ -68,7 +70,7 @@ void konami_godmode() {
         lv_obj_align(label2, LV_ALIGN_TOP_LEFT, 20, 150);
     }
 
-    delay(3000);
+    vTaskDelay(pdMS_TO_TICKS(3000));
 
     lab_mode = true;
     Serial.println("[EASTER] LAB MODE ATIVADO - logs e experimentos protegidos");

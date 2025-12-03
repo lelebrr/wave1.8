@@ -10,6 +10,8 @@
 */
 
 #include <Arduino.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "simulation_manager.h"
 #include "ui.h"
 
@@ -302,7 +304,7 @@ void SimulationManager::wps_attack_sim(const uint8_t* ap_mac, uint8_t channel) {
              channel,
              ap_mac ? mac_suffix : "NA");
     lab_log_event("wps_attack_sim", details);
-    delay(50);
+    vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
 

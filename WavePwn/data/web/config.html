@@ -2,684 +2,348 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WAVE PWN v2 — Web Config</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WavePwn v2 — Config</title>
+
+  <!-- Bootstrap 5 (CDN) + tema cyberpunk próprio -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  >
+  <link href="style.css" rel="stylesheet">
   <link rel="icon" href="favicon.ico">
+
   <style>
-    .tabs {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      border-bottom: 1px solid rgba(148,163,184,0.4);
-      padding-bottom: 4px;
-    }
-    .tab-btn {
-      padding: 5px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
-      background: rgba(15,23,42,0.9);
+    body.bg-dark {
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
       color: #e5e7eb;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      opacity: 0.75;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
     }
-    .tab-btn.active {
-      border-color: rgba(56,189,248,0.9);
-      box-shadow: 0 0 12px rgba(56,189,248,0.7);
-      opacity: 1;
+
+    .text-cyan {
+      color: #22d3ee;
     }
-    .tab-content {
-      display: none;
-      margin-top: 10px;
-      padding: 10px 12px 12px;
-      border-radius: 14px;
-      background: rgba(15,23,42,0.9);
+
+    .wp-card {
+      border-radius: 16px;
       border: 1px solid rgba(148,163,184,0.4);
-      box-shadow: 0 16px 32px rgba(15,23,42,0.9);
-      font-size: 0.8rem;
+      background: rgba(15,23,42,0.9);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.95);
     }
-    .tab-content.active {
-      display: block;
+
+    .wp-card-header {
+      border-bottom: 1px solid rgba(148,163,184,0.3);
     }
-    .field-group {
-      margin-bottom: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .field-group label {
-      font-size: 0.75rem;
-      color: #9ca3af;
+
+    .nav-tabs .nav-link {
+      border-radius: 999px 999px 0 0;
+      border: 1px solid transparent;
+      color: #cbd5f5;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      font-size: 0.76rem;
+      padding: 0.4rem 0.9rem;
     }
-    .field-group input,
-    .field-group select,
-    .field-group textarea {
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(75,85,99,0.9);
-      background: rgba(15,23,42,0.95);
-      color: #e5e7eb;
-      font-size: 0.8rem;
-      font-family: inherit;
+
+    .nav-tabs .nav-link.active {
+      color: #22d3ee;
+      border-color: rgba(56,189,248,0.8) rgba(56,189,248,0.8) #0f172a;
+      background: radial-gradient(circle at top, rgba(56,189,248,0.35), #020617);
+      box-shadow: 0 0 14px rgba(56,189,248,0.8);
     }
-    .field-group textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-    .section-title {
-      margin: 0 0 8px;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #e5e7eb;
-    }
-    .hint {
-      font-size: 0.7rem;
-      color: #9ca3af;
-    }
-    .pill {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.7);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-right: 6px;
-    }
-    .pill.ok {
-      border-color: rgba(34,197,94,0.8);
-      color: #bbf7d0;
-    }
-    .pill.warn {
-      border-color: rgba(250,204,21,0.8);
-      color: #fef3c7;
-    }
-    .pill.danger {
-      border-color: rgba(248,113,113,0.9);
-      color: #fee2e2;
-    }
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .row > .field-group {
-      flex: 1 1 160px;
-    }
-    .tiny-btn {
-      font-size: 0.7rem;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.7);
-      background: rgba(15,23,42,0.95);
-      color: #e5e7eb;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-    .tiny-btn.primary {
-      border-color: rgba(56,189,248,0.9);
-      box-shadow: 0 0 12px rgba(56,189,248,0.7);
-    }
-    .tiny-btn.danger {
-      border-color: rgba(248,113,113,0.9);
-      color: #fecaca;
-    }
-    .section-footer {
-      margin-top: 8px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-    #gemini_response {
-      margin-top: 6px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(75,85,99,0.9);
-      background: rgba(15,23,42,0.95);
-      min-height: 40px;
-      white-space: pre-wrap;
+
+    .form-label {
       font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+    }
+
+    .form-control,
+    .form-select {
+      background: rgba(15,23,42,0.95);
+      border-radius: 0.6rem;
+      border-color: rgba(75,85,99,0.9);
       color: #e5e7eb;
+      font-size: 0.86rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: rgba(56,189,248,0.9);
+      box-shadow: 0 0 0 0.1rem rgba(56,189,248,0.4);
+      background: rgba(15,23,42,0.98);
+      color: #f9fafb;
+    }
+
+    .form-text {
+      font-size: 0.72rem;
+    }
+
+    .badge-soft {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.85);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .neura9-range {
+      accent-color: #22d3ee;
+    }
+
+    .tab-pane {
+      padding-top: 1rem;
+    }
+
+    #neura9_sens_label {
+      font-size: 0.78rem;
+      color: #9ca3af;
+    }
+
+    #lab_status,
+    #gemini_status {
+      font-size: 0.8rem;
+    }
+
+    .btn-save-all {
+      letter-spacing: 0.12em;
     }
   </style>
 </head>
-<body>
-  <div class="glow-bg"></div>
-  <div class="scanlines"></div>
+<body class="bg-dark text-cyan">
+<div class="glow-bg"></div>
+<div class="scanlines"></div>
 
-  <div class="container">
-    <header class="header">
-      <div class="title-wrap">
-        <h1>WAVE PWN <span class="tag">CONFIG</span></h1>
-        <span id="cfg-status" class="status-pill online">● CONFIG</span>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="wp-card">
+        <div class="wp-card-header px-4 pt-3 pb-2 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+          <div>
+            <h1 class="h4 mb-1 text-cyan text-uppercase" style="letter-spacing:0.18em;">
+              WAVE PWN v2 — CONFIG
+            </h1>
+            <div class="small text-muted">
+              ESP32‑S3 · NEURA9 · Lab Mode · Gemini AI
+            </div>
+          </div>
+          <div class="mt-3 mt-md-0 text-md-end">
+            <span class="badge-soft me-2">Web Config</span>
+            <span class="badge-soft">Defensive‑First</span>
+          </div>
+        </div>
+
+        <div class="px-4 pt-3 pb-4">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" id="configTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="device-tab" data-bs-toggle="tab"
+                      data-bs-target="#device" type="button" role="tab">
+                Dispositivo
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="assistant-tab" data-bs-toggle="tab"
+                      data-bs-target="#assistant" type="button" role="tab">
+                Assistente
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="neura9-tab" data-bs-toggle="tab"
+                      data-bs-target="#neura9" type="button" role="tab">
+                NEURA9
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="lab-tab" data-bs-toggle="tab"
+                      data-bs-target="#lab" type="button" role="tab">
+                Lab Mode
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="gemini-tab" data-bs-toggle="tab"
+                      data-bs-target="#gemini" type="button" role="tab">
+                Gemini AI
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="security-tab" data-bs-toggle="tab"
+                      data-bs-target="#security" type="button" role="tab">
+                Segurança
+              </button>
+            </li>
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content mt-3">
+            <!-- Dispositivo -->
+            <div class="tab-pane fade show active" id="device" role="tabpanel" aria-labelledby="device-tab">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="device_name" class="form-label">Nome do Dispositivo</label>
+                  <input type="text" id="device_name" class="form-control" placeholder="WavePwn">
+                  <div class="form-text">
+                    Este nome aparece na Alexa / Google Home e em relatórios.
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="owner" class="form-label">Dono</label>
+                  <input type="text" id="owner" class="form-control" placeholder="Seu nome">
+                  <div class="form-text">
+                    Apenas para uso interno em relatórios e logs.
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mt-1">
+                <div class="col-md-4">
+                  <label for="lang" class="form-label">Idioma</label>
+                  <select id="lang" class="form-select">
+                    <option value="pt-BR">pt-BR</option>
+                    <option value="en-US">en-US</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="theme" class="form-label">Tema</label>
+                  <select id="theme" class="form-select">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="voice_alerts" class="form-label">Alertas de voz</label>
+                  <select id="voice_alerts" class="form-select">
+                    <option value="true">Ativos</option>
+                    <option value="false">Desativados</option>
+                  </select>
+                  <div class="form-text">
+                    Resumos periódicos falados pelos assistentes.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Assistente -->
+            <div class="tab-pane fade" id="assistant" role="tabpanel" aria-labelledby="assistant-tab">
+              <div class="mb-3">
+                <label for="assistant" class="form-label">Assistente de voz</label>
+                <select id="assistant" class="form-select">
+                  <option value="none">Nenhum</option>
+                  <option value="alexa">Alexa</option>
+                  <option value="google">Google Home</option>
+                  <option value="both">Ambos</option>
+                </select>
+                <div class="form-text">
+                  Integração local via fauxmoESP e Home Assistant. Nenhum tráfego é enviado
+                  à nuvem além do já exigido pelos próprios assistentes.
+                </div>
+              </div>
+            </div>
+
+            <!-- NEURA9 -->
+            <div class="tab-pane fade" id="neura9" role="tabpanel" aria-labelledby="neura9-tab">
+              <div class="mb-3">
+                <label for="neura9_sens" class="form-label">Sensibilidade da NEURA9</label>
+                <input type="range" class="form-range neura9-range"
+                       id="neura9_sens" min="0.10" max="1.00" step="0.01"
+                       oninput="update_neura9_label(this.value)">
+                <div id="neura9_sens_label" class="form-text">
+                  0.78 · equilíbrio entre falsos positivos e falsos negativos.
+                </div>
+              </div>
+              <div class="form-text">
+                Valores menores tornam a IA mais conservadora; valores próximos de 1.0
+                tornam a NEURA9 mais agressiva na identificação de anomalias.
+              </div>
+            </div>
+
+            <!-- Lab Mode -->
+            <div class="tab-pane fade" id="lab" role="tabpanel" aria-labelledby="lab-tab">
+              <div class="alert alert-danger mb-3">
+                <strong>MODO LABORATÓRIO — APENAS COM AUTORIZAÇÃO.</strong><br>
+                Tudo aqui é simulação acadêmica, mas ainda assim exige cuidado.
+              </div>
+              <p class="form-text mb-2">
+                Para ativar o Lab Mode são necessários dois fatores:
+              </p>
+              <ul class="form-text mb-3">
+                <li>Arquivo de guarda <code>/sd/.enable_lab_attacks</code> no microSD.</li>
+                <li>PIN de 6 dígitos desbloqueado nesta sessão.</li>
+              </ul>
+
+              <div class="mb-3">
+                <label for="lab_pin" class="form-label">PIN de 6 dígitos</label>
+                <input type="password" id="lab_pin" maxlength="6" class="form-control" placeholder="******">
+                <div class="form-text">
+                  Usado para definir/atualizar o PIN e desbloquear o Lab Mode na sessão atual.
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-danger" type="button" onclick="enable_lab()">
+                  ATIVAR LAB MODE
+                </button>
+                <button class="btn btn-outline-light btn-sm" type="button" onclick="refresh_lab_status()">
+                  Atualizar status
+                </button>
+              </div>
+              <div id="lab_status" class="mt-3"></div>
+            </div>
+
+            <!-- Gemini -->
+            <div class="tab-pane fade" id="gemini" role="tabpanel" aria-labelledby="gemini-tab">
+              <div class="mb-3">
+                <label for="gemini_key" class="form-label">Gemini API Key</label>
+                <input type="password" id="gemini_key" class="form-control" placeholder="API Key">
+                <div class="form-text">
+                  A chave é salva em <code>/config/gemini_key.txt</code> no microSD.
+                  Use apenas para ambientes de laboratório controlado.
+                </div>
+              </div>
+              <div class="d-flex gap-2 mb-3">
+                <button class="btn btn-primary" type="button" onclick="test_gemini()">
+                  TESTAR CONEXÃO
+                </button>
+              </div>
+              <div id="gemini_status"></div>
+            </div>
+
+            <!-- Segurança -->
+            <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+              <p class="form-text mb-2">
+                Consulte <code>docs/SECURITY_POLICY.md</code> para detalhes sobre
+                uso defensivo, anti‑tamper e boas práticas de OTA.
+              </p>
+              <ul class="form-text">
+                <li>Alterar a senha padrão do AP e da interface OTA.</li>
+                <li>Proteger fisicamente o microSD (especialmente a pasta <code>/sd/wavepwn</code>).</li>
+                <li>Manter o firmware assinado quando o secure boot estiver habilitado.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <button class="btn btn-success btn-lg btn-save-all" type="button" onclick="save_all()">
+              SALVAR TUDO E REINICIAR
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="sub">
-        <span class="badge">Web Config · ESP32‑S3</span>
-        <span class="badge">NEURA9 · Lab Mode · Gemini</span>
-        <span class="badge">Defensive‑First</span>
+
+      <div class="text-end text-muted small mt-2">
+        WavePwn v2 · Web Config · 100% defensivo por design
       </div>
-    </header>
-
-    <main class="layout">
-      <section class="left">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="device">Device</button>
-          <button class="tab-btn" data-tab="assistant">Assistant</button>
-          <button class="tab-btn" data-tab="neura9">NEURA9</button>
-          <button class="tab-btn" data-tab="lab">Lab Mode</button>
-          <button class="tab-btn" data-tab="wifi">Wi‑Fi Attacks</button>
-          <button class="tab-btn" data-tab="bt">Bluetooth Attacks</button>
-          <button class="tab-btn" data-tab="gemini">Gemini AI</button>
-          <button class="tab-btn" data-tab="ota">OTA &amp; Backup</button>
-          <button class="tab-btn" data-tab="security">Security</button>
-          <button class="tab-btn" data-tab="logs">Logs &amp; Reports</button>
-          <button class="tab-btn" data-tab="eggs">Easter Eggs</button>
-          <button class="tab-btn" data-tab="about">About</button>
-        </div>
-
-        <!-- Device Settings -->
-        <div id="tab-device" class="tab-content active">
-          <h2 class="section-title">Device Settings</h2>
-          <div class="row">
-            <div class="field-group">
-              <label for="device_name">Nome do dispositivo</label>
-              <input id="device_name" placeholder="CyberGuard Pro">
-            </div>
-            <div class="field-group">
-              <label for="owner">Dono</label>
-              <input id="owner" placeholder="Seu Nome">
-            </div>
-          </div>
-          <div class="row">
-            <div class="field-group">
-              <label for="language">Idioma</label>
-              <select id="language">
-                <option value="pt-BR">pt-BR</option>
-                <option value="en-US">en-US</option>
-              </select>
-            </div>
-            <div class="field-group">
-              <label for="theme">Tema</label>
-              <select id="theme">
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-              </select>
-            </div>
-          </div>
-          <div class="field-group">
-            <label>Alerts de voz</label>
-            <select id="voice_alerts">
-              <option value="true">Ativos</option>
-              <option value="false">Desativados</option>
-            </select>
-          </div>
-          <div class="section-footer">
-            <button class="tiny-btn primary" onclick="saveDeviceConfig()">Salvar Device Settings</button>
-          </div>
-        </div>
-
-        <!-- Assistant -->
-        <div id="tab-assistant" class="tab-content">
-          <h2 class="section-title">Assistant</h2>
-          <div class="field-group">
-            <label for="assistant">Assistente</label>
-            <select id="assistant">
-              <option value="none">Nenhum</option>
-              <option value="alexa">Alexa</option>
-              <option value="google">Google</option>
-              <option value="both">Ambos</option>
-            </select>
-            <span class="hint">Controla integração com Alexa / Google Home.</span>
-          </div>
-          <div class="section-footer">
-            <button class="tiny-btn primary" onclick="saveDeviceConfig()">Salvar Assistente</button>
-          </div>
-        </div>
-
-        <!-- NEURA9 -->
-        <div id="tab-neura9" class="tab-content">
-          <h2 class="section-title">NEURA9</h2>
-          <div class="field-group">
-            <label for="neura9_sens">Sensibilidade</label>
-            <input type="range" id="neura9_sens" min="0.1" max="1.0" step="0.01" value="0.78" oninput="updateSensLabel(this.value)">
-            <span id="neura9_sens_label" class="hint">0.78 · equilíbrio entre falsos positivos e falsos negativos</span>
-          </div>
-          <p class="hint">
-            Ajuste para tornar a NEURA9 mais conservadora (valores menores) ou
-            mais agressiva na detecção de anomalias (valores maiores).
-          </p>
-          <div class="section-footer">
-            <button class="tiny-btn primary" onclick="saveDeviceConfig()">Salvar Sensibilidade</button>
-          </div>
-        </div>
-
-        <!-- Lab Mode -->
-        <div id="tab-lab" class="tab-content">
-          <h2 class="section-title">Lab Mode</h2>
-          <p class="hint">
-            O modo laboratório libera as <strong>simulações acadêmicas</strong> de ataques.
-            Ele exige dois fatores:
-          </p>
-          <ul class="hint">
-            <li>Arquivo de guarda <code>/sd/.enable_lab_attacks</code> no microSD.</li>
-            <li>PIN de 6 dígitos desbloqueado nesta sessão.</li>
-          </ul>
-
-          <div style="margin:8px 0;">
-            <span id="lab_guard_pill" class="pill">GUARD FILE</span>
-            <span id="lab_pin_pill" class="pill">PIN</span>
-            <span id="lab_unlocked_pill" class="pill">LAB MODE</span>
-          </div>
-
-          <div class="field-group">
-            <label for="lab_pin_set">Definir/alterar PIN (6 dígitos)</label>
-            <input id="lab_pin_set" type="password" maxlength="6" placeholder="******">
-            <span class="hint">Use somente dígitos e armazene este PIN em local seguro.</span>
-          </div>
-          <div class="section-footer">
-            <button class="tiny-btn primary" onclick="setLabPin()">Salvar PIN</button>
-          </div>
-
-          <div class="field-group" style="margin-top:10px;">
-            <label for="lab_pin_unlock">Desbloquear Lab Mode (sessão atual)</label>
-            <input id="lab_pin_unlock" type="password" maxlength="6" placeholder="PIN de 6 dígitos">
-          </div>
-          <div class="section-footer">
-            <button class="tiny-btn primary" onclick="unlockLab()">Desbloquear</button>
-          </div>
-        </div>
-
-        <!-- Wi-Fi Attacks (simulados) -->
-        <div id="tab-wifi" class="tab-content">
-          <h2 class="section-title">Wi‑Fi Attacks (SIMULAÇÕES)</h2>
-          <p class="hint">
-            Estes controles configuram apenas <strong>simulações acadêmicas</strong>.
-            Nenhum frame malicioso real é enviado. O objetivo é alimentar dashboards,
-            NEURA9 e relatórios de laboratório.
-          </p>
-          <ul class="hint">
-            <li>Deauth Burst · Evil Twin · Beacon Spam · PMKID Flood</li>
-            <li>WPS PIN (simulado) · Karma/MANA · WPA3 → WPA2 downgrade (simulado)</li>
-          </ul>
-          <p class="hint">
-            A lógica detalhada das simulações está em <code>src/lab_simulations/</code>.
-          </p>
-        </div>
-
-        <!-- Bluetooth Attacks (simulados) -->
-        <div id="tab-bt" class="tab-content">
-          <h2 class="section-title">Bluetooth Attacks (SIMULAÇÕES)</h2>
-          <p class="hint">
-            Simulações de cenários de saturação e HID injection para fins didáticos,
-            sem interferência ou comandos reais:
-          </p>
-          <ul class="hint">
-            <li>Name Spam (simulado)</li>
-            <li>Jammer Full Band (simulado)</li>
-            <li>Inquiry Flood (simulado)</li>
-            <li>HID Injection (teclado simulado)</li>
-          </ul>
-        </div>
-
-        <!-- Gemini AI -->
-        <div id="tab-gemini" class="tab-content">
-          <h2 class="section-title">Gemini AI Integration</h2>
-          <div class="field-group">
-            <label for="gemini_key">API Key</label>
-            <input type="password" id="gemini_key" placeholder="API Key">
-            <span class="hint">
-              A chave é salva em <code>/config/gemini_key.txt</code> no microSD.
-              Use apenas para ambientes de teste controlados.
-            </span>
-          </div>
-          <div class="section-footer">
-            <button class="tiny-btn primary" onclick="save_key()">Salvar</button>
-          </div>
-
-          <div class="field-group" style="margin-top:10px;">
-            <label for="prompt">Prompt para análise</label>
-            <textarea id="prompt">Analise este log de laboratório e descreva riscos em linguagem simples.</textarea>
-            <span class="hint">
-              Evite enviar payloads completos ou dados pessoais. Prefira resumos,
-              estatísticas e descrições de cenários.
-            </span>
-          </div>
-          <div class="section-footer">
-            <button class="tiny-btn primary" onclick="ask_gemini()">Enviar ao Gemini</button>
-          </div>
-          <div id="gemini_response"></div>
-        </div>
-
-        <!-- OTA & Backup -->
-        <div id="tab-ota" class="tab-content">
-          <h2 class="section-title">OTA &amp; Backup</h2>
-          <p class="hint">
-            Atualize o firmware e faça backup dos relatórios usando rotas já
-            existentes do WavePwn.
-          </p>
-          <ul class="hint">
-            <li>OTA: <code>/ota/update.html</code> (protegido por senha)</li>
-            <li>Relatórios em PDF: <code>/sd/reports/</code></li>
-            <li>Capturas técnicas: <code>/sd/wavepwn/</code></li>
-          </ul>
-        </div>
-
-        <!-- Security -->
-        <div id="tab-security" class="tab-content">
-          <h2 class="section-title">Security</h2>
-          <p class="hint">
-            Consulte <code>docs/SECURITY_POLICY.md</code> para os princípios
-            de uso defensivo, anti‑tamper e boas práticas de OTA.
-          </p>
-          <p class="hint">
-            Recomenda-se alterar credenciais OTA, proteger fisicamente o
-            microSD e manter o firmware sempre assinado em builds de produção.
-          </p>
-        </div>
-
-        <!-- Logs & Reports -->
-        <div id="tab-logs" class="tab-content">
-          <h2 class="section-title">Logs &amp; Reports</h2>
-          <p class="hint">
-            Os principais diretórios no microSD são:
-          </p>
-          <ul class="hint">
-            <li><code>/sd/wavepwn/handshakes</code> · capturas técnicas</li>
-            <li><code>/sd/wavepwn/pmkid</code> · PMKID prontos para Hashcat</li>
-            <li><code>/sd/lab_logs</code> · logs das simulações de laboratório</li>
-            <li><code>/sd/reports</code> · relatórios simplificados em "PDF"</li>
-          </ul>
-        </div>
-
-        <!-- Easter Eggs -->
-        <div id="tab-eggs" class="tab-content">
-          <h2 class="section-title">Easter Eggs</h2>
-          <p class="hint">
-            O WavePwn inclui Easter Eggs como o <strong>Konami GODMODE</strong>,
-            descrito no código em <code>easter_egg/konami_godmode.cpp</code>.
-          </p>
-          <p class="hint">
-            Esses recursos nunca habilitam ataques reais; apenas desbloqueiam
-            camadas extras de visual e proteção de logs em modo laboratório.
-          </p>
-        </div>
-
-        <!-- About -->
-        <div id="tab-about" class="tab-content">
-          <h2 class="section-title">About</h2>
-          <p class="hint">
-            WavePwn v2 · NEURA9 Defensive Grid · ESP32‑S3 Touch AMOLED.
-          </p>
-          <p class="hint">
-            Este painel foi projetado para centralizar configurações em um
-            único lugar, mantendo o foco em <strong>defesa</strong>,
-            <strong>ética</strong> e <strong>experimentação controlada</strong>.
-          </p>
-        </div>
-      </section>
-
-      <section class="right">
-        <div class="logs">
-          <div class="logs-header">
-            <span>Config Log</span>
-            <span id="cfg-log-counter" class="logs-counter">0 eventos</span>
-          </div>
-          <pre id="cfg-log" class="logs-body"></pre>
-        </div>
-        <div class="actions">
-          <button class="btn primary" onclick="location.href='/'">
-            VOLTAR AO DASHBOARD
-          </button>
-          <button class="btn ghost" onclick="location.reload()">
-            RECARREGAR CONFIG
-          </button>
-        </div>
-        <div class="footer">
-          <span>WAVE PWN v2 · Web Config · 100% defensivo por design</span>
-        </div>
-      </section>
-    </main>
+    </div>
   </div>
+</div>
 
-<script>
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
-  const logEl = document.getElementById('cfg-log');
-  const logCounterEl = document.getElementById('cfg-log-counter');
-
-  let logCount = 0;
-
-  function appendLog(msg) {
-    if (!msg) return;
-    logCount++;
-    logCounterEl.textContent = logCount + ' eventos';
-    const atBottom = logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight < 8;
-    logEl.textContent += msg + '\\n';
-    if (logEl.textContent.length > 8000) {
-      logEl.textContent = logEl.textContent.slice(-8000);
-    }
-    if (atBottom) {
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-  }
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.getAttribute('data-tab');
-      tabButtons.forEach(b => b.classList.toggle('active', b === btn));
-      tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + target));
-    });
-  });
-
-  function updateSensLabel(v) {
-    const el = document.getElementById('neura9_sens_label');
-    el.textContent = `${Number(v).toFixed(2)} · sensibilidade da NEURA9`;
-  }
-
-  async function loadDeviceConfig() {
-    try {
-      const res = await fetch('/api/config/device');
-      if (!res.ok) {
-        appendLog('[CFG] Falha ao carregar device_config.json');
-        return;
-      }
-      const cfg = await res.json();
-      document.getElementById('device_name').value = cfg.device_name || 'CyberGuard Pro';
-      document.getElementById('owner').value = cfg.owner || '';
-      document.getElementById('language').value = cfg.language || 'pt-BR';
-      document.getElementById('theme').value = cfg.theme || 'dark';
-      document.getElementById('assistant').value = cfg.assistant || 'none';
-      document.getElementById('voice_alerts').value =
-        (typeof cfg.enable_voice_alerts === 'boolean'
-          ? String(cfg.enable_voice_alerts)
-          : 'true');
-      const sens = typeof cfg.neura9_sensitivity === 'number'
-        ? cfg.neura9_sensitivity
-        : 0.78;
-      const sensSlider = document.getElementById('neura9_sens');
-      sensSlider.value = sens;
-      updateSensLabel(sens);
-      appendLog('[CFG] device_config.json carregado');
-    } catch (e) {
-      appendLog('[CFG] Erro ao carregar config: ' + e);
-    }
-  }
-
-  async function saveDeviceConfig() {
-    const body = {
-      device_name: document.getElementById('device_name').value || 'CyberGuard Pro',
-      owner: document.getElementById('owner').value || '',
-      language: document.getElementById('language').value || 'pt-BR',
-      theme: document.getElementById('theme').value || 'dark',
-      assistant: document.getElementById('assistant').value || 'none',
-      enable_voice_alerts: document.getElementById('voice_alerts').value === 'true',
-      neura9_sensitivity: Number(document.getElementById('neura9_sens').value) || 0.78
-    };
-
-    try {
-      const res = await fetch('/api/config/device', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
-      });
-      if (!res.ok) {
-        appendLog('[CFG] Falha ao salvar device_config.json (' + res.status + ')');
-        return;
-      }
-      appendLog('[CFG] device_config.json salvo com sucesso');
-    } catch (e) {
-      appendLog('[CFG] Erro ao salvar config: ' + e);
-    }
-  }
-
-  async function loadLabStatus() {
-    try {
-      const res = await fetch('/api/lab/status');
-      if (!res.ok) {
-        appendLog('[LAB] Falha ao consultar status do Lab Mode');
-        return;
-      }
-      const st = await res.json();
-      const guard = document.getElementById('lab_guard_pill');
-      const pin = document.getElementById('lab_pin_pill');
-      const unlocked = document.getElementById('lab_unlocked_pill');
-
-      guard.classList.toggle('ok', !!st.lab_guard_file);
-      guard.classList.toggle('danger', !st.lab_guard_file);
-      guard.textContent = st.lab_guard_file ? 'GUARD FILE OK' : 'GUARD FILE AUSENTE';
-
-      pin.classList.toggle('ok', !!st.pin_set);
-      pin.classList.toggle('warn', !st.pin_set);
-      pin.textContent = st.pin_set ? 'PIN CONFIGURADO' : 'PIN NAO DEFINIDO';
-
-      unlocked.classList.toggle('ok', !!st.lab_unlocked);
-      unlocked.classList.toggle('warn', !st.lab_unlocked);
-      unlocked.textContent = st.lab_unlocked ? 'LAB UNLOCKED' : 'LAB BLOQUEADO';
-
-      appendLog('[LAB] Status: guard=' + st.lab_guard_file +
-                ', pin_set=' + st.pin_set +
-                ', unlocked=' + st.lab_unlocked);
-    } catch (e) {
-      appendLog('[LAB] Erro ao consultar Lab Mode: ' + e);
-    }
-  }
-
-  function isSixDigitPin(s) {
-    return /^[0-9]{6}$/.test(s || '');
-  }
-
-  async function setLabPin() {
-    const pin = document.getElementById('lab_pin_set').value.trim();
-    if (!isSixDigitPin(pin)) {
-      appendLog('[LAB] PIN inválido: use exatamente 6 dígitos');
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/lab/set_pin', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({pin})
-      });
-      if (!res.ok) {
-        appendLog('[LAB] Falha ao salvar PIN (' + res.status + ')');
-        return;
-      }
-      appendLog('[LAB] PIN salvo com sucesso em /config/lab_config.json');
-      document.getElementById('lab_pin_set').value = '';
-      loadLabStatus();
-    } catch (e) {
-      appendLog('[LAB] Erro ao salvar PIN: ' + e);
-    }
-  }
-
-  async function unlockLab() {
-    const pin = document.getElementById('lab_pin_unlock').value.trim();
-    if (!isSixDigitPin(pin)) {
-      appendLog('[LAB] PIN inválido para desbloqueio');
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/lab/unlock', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({pin})
-      });
-      const j = await res.json().catch(() => ({}));
-      if (!res.ok || !j.ok) {
-        appendLog('[LAB] Desbloqueio negado: ' + (j.error || res.status));
-        return;
-      }
-      appendLog('[LAB] Lab Mode desbloqueado para a sessão atual');
-      document.getElementById('lab_pin_unlock').value = '';
-      loadLabStatus();
-    } catch (e) {
-      appendLog('[LAB] Erro ao desbloquear Lab Mode: ' + e);
-    }
-  }
-
-  async function save_key() {
-    const key = document.getElementById('gemini_key').value.trim();
-    if (!key) {
-      appendLog('[Gemini] Nenhuma chave informada');
-      return;
-    }
-    try {
-      const res = await fetch('/api/gemini/key', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({key})
-      });
-      if (!res.ok) {
-        appendLog('[Gemini] Falha ao salvar chave (' + res.status + ')');
-        return;
-      }
-      appendLog('[Gemini] Chave salva em /config/gemini_key.txt');
-      document.getElementById('gemini_key').value = '';
-    } catch (e) {
-      appendLog('[Gemini] Erro ao salvar chave: ' + e);
-    }
-  }
-
-  async function ask_gemini() {
-    const prompt = document.getElementById('prompt').value;
-    if (!prompt.trim()) {
-      appendLog('[Gemini] Prompt vazio');
-      return;
-    }
-
-    try {
-      appendLog('[Gemini] Enviando prompt para Gemini...');
-      const res = await fetch('/api/gemini/ask', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({prompt})
-      });
-      if (!res.ok) {
-        appendLog('[Gemini] Falha na chamada (' + res.status + ')');
-        return;
-      }
-      const j = await res.json();
-      document.getElementById('gemini_response').textContent = j.response || '(sem resposta)';
-      appendLog('[Gemini] Resposta recebida');
-    } catch (e) {
-      appendLog('[Gemini] Erro ao chamar Gemini: ' + e);
-    }
-  }
-
-  window.addEventListener('load', () => {
-    loadDeviceConfig();
-    loadLabStatus();
-  });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="config.js"></script>
 </body>
 </html>

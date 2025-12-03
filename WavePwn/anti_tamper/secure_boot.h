@@ -1,9 +1,11 @@
 #pragma once
 
-#include &lt;Arduino.h&gt;
-#include &lt;esp_system.h&gt;
-#include &lt;esp_err.h&gt;
-#include &lt;esp_secure_boot.h&gt;
+#include <Arduino.h>
+#include <esp_system.h>
+#include <esp_err.h>
+#include <esp_secure_boot.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 // Verificação simples de secure boot / anti‑tamper.
 //
@@ -16,7 +18,7 @@ inline void anti_tamper_check() {
     if (res != ESP_OK) {
         Serial.println("[SECURE] TAMPER DETECTADO - travando dispositivo");
         while (true) {
-            delay(1000);
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
     } else {
         Serial.println("[SECURE] Secure boot OK");
