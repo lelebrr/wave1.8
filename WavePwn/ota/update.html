@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>WAVE PWN v2 — OTA Update Seguro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #020617;
+      --card: rgba(15, 23, 42, 0.92);
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.18);
+      --danger: #f97373;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.45);
+      --radius: 16px;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #020617 0, #000 80%);
+      color: var(--text);
+      font-family: var(--font);
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px 22px 18px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow:
+        0 18px 45px rgba(15, 23, 42, 0.95),
+        0 0 28px rgba(56, 189, 248, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.16), transparent 60%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h1 span {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.9);
+    }
+    p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    p + p {
+      margin-top: 4px;
+    }
+    .warning {
+      margin-top: 12px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(248, 113, 113, 0.6);
+      background: rgba(127, 29, 29, 0.5);
+      color: #fecaca;
+      font-size: 0.75rem;
+    }
+    .warning strong {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .form {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.55);
+    }
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    input[type="file"] {
+      display: block;
+      width: 100%;
+      font-size: 0.78rem;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .hint {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.72rem;
+    }
+    .badge {
+      flex: 1;
+      padding: 4px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      text-align: center;
+      color: var(--muted);
+    }
+    .badge strong {
+      color: var(--accent);
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    button {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text);
+      cursor: pointer;
+      transition:
+        background 0.15s ease-out,
+        border-color 0.15s ease-out,
+        box-shadow 0.15s ease-out,
+        transform 0.08s ease-out;
+    }
+    button.primary {
+      border-color: rgba(56, 189, 248, 0.85);
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.4), #020617);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.75);
+    }
+    button.secondary {
+      border-style: dashed;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.9);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    .footer {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: right;
+    }
+    #status {
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    #status.ok {
+      color: #bbf7d0;
+    }
+    #status.err {
+      color: #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-inner">
+      <h1>OTA UPDATE <span>WAVE PWN v2</span></h1>
+      <p>Atualização de firmware segura, direta no ESP32‑S3.</p>
+      <p>Protegido por HTTP Basic Auth (admin / wavepwn).</p>
+
+      <div class="warning">
+        <strong>AVISO</strong><br>
+        - Use apenas firmwares oficiais ou que você mesmo compilou.<br>
+        - Não desligue o dispositivo durante o upload.<br>
+        - Este OTA existe apenas para manutenção legítima.
+      </div>
+
+      <form class="form" method="POST" action="/ota/firmware" enctype="multipart/form-data" id="otaForm">
+        <label for="firmware">Arquivo .bin</label>
+        <input id="firmware" name="firmware" type="file" accept=".bin" required>
+        <div class="hint">Gere o .bin pelo PlatformIO / Arduino IDE e selecione aqui.</div>
+
+        <div class="badge-row">
+          <div class="badge">
+            Login: <strong>admin</strong>
+          </div>
+          <div class="badge">
+            Senha: <strong>wavepwn</strong>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="primary">ENVIAR FIRMWARE</button>
+          <button type="button" class="secondary" onclick="window.location.href='/'">
+            VOLTAR AO DASHBOARD
+          </button>
+        </div>
+
+        <div id="status"></div>
+      </form>
+
+      <div class="footer">
+        WAVE PWN v2 · OTA local, offline, 100% ético
+      </div>
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById('otaForm');
+    const statusEl = document.getElementById('status');
+
+    form.addEventListener('submit', function () {
+      statusEl.textContent = 'Enviando firmware... não desligue o dispositivo.';
+      statusEl.className = '';
+    });
+  </script>
+</body>
+</html>
