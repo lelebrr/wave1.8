@@ -15,6 +15,7 @@
 #include "capture.h"
 #include "ai/neura9_inference.h"
 #include "src/webserver.h"
+#include "src/home_assistant.h"
 #include "ble_grid/pwn_grid.h"
 #include "anti_tamper/secure_boot.h"
 #include "reports/tiny_pdf.h"
@@ -172,12 +173,18 @@ void Pwnagotchi::begin() {
     // Webserver + WebSocket + OTA seguro
     webserver_start();
 
+    // Integração opcional com Home Assistant / Google Home
+    ha_init();
+
     Serial.println("WAVE PWN PRONTO PARA DOMINAR");
 }
 
 void Pwnagotchi::update() {
     // Uptimes simples em segundos (aprox.)
     uptime = millis() / 1000;
+
+    // Atualiza timers relacionados ao Home Assistant (NTP etc.).
+    ha_loop();
 
     // Placeholders de ambiente (até integrar sensores reais reais).
     // Estes valores podem ser sobrescritos por sensores.cpp quando existirem.
@@ -201,7 +208,7 @@ void Pwnagotchi::update() {
         is_moving
     );
 
-    // NEURA9 avalia o ambiente periodicamente (HUD + PwnGrid)
+    // NEURA9 avalia o ambiente periodicamente (HUD + PwnGrid + Home Assistant)
     static uint32_t last_ai = 0;
     uint32_t now = millis();
     if (now - last_ai > 800) {
@@ -223,6 +230,9 @@ void Pwnagotchi::update() {
 
         // Compartilha nível de ameaça com a PwnGrid cooperativa
         pwnGrid.share_threat_level(cls);
+
+        // Publica o nível de ameaça atual no Home Assistant / Google Home.
+        ha_send_threat(NEURA9_THREAT_LABELS[cls]);
     }
 
     // Tema dark/light automatico simples baseado em tempo de execução

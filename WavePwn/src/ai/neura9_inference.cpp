@@ -36,10 +36,12 @@ bool Neura9::begin() {
         return false;
     }
 
-    static tflite::MicroMutableOpResolver<8> resolver;
+    // Resolver mínimo para o modelo denso (Dense + ReLU + Softmax).
+    static tflite::MicroMutableOpResolver<4> resolver;
     resolver.AddFullyConnected();
     resolver.AddReshape();
     resolver.AddSoftmax();
+    resolver.AddRelu();
 
     static tflite::MicroInterpreter static_interpreter(
         model,
@@ -60,7 +62,7 @@ bool Neura9::begin() {
     input = interpreter->input(0);
     output = interpreter->output(0);
 
-    Serial.println("[NEURA9] IA defensiva carregada — placeholder — 100% offline");
+    Serial.println("[NEURA9] IA defensiva NEURA9 carregada — modelo TFLite em RAM — 100% offline");
     return true;
 }
 
