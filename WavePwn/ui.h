@@ -4,4 +4,14 @@
 
 #pragma once
 
-// Futuras declarações da interface de usuário LVGL.
+#include <lvgl.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void ui_init(void);
+
+#ifdef __cplusplus
+}
+#endif
