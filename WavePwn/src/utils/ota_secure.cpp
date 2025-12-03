@@ -17,7 +17,7 @@ bool ota_begin_secure(size_t size) {
 }
 
 bool ota_write_chunk(const uint8_t *data, size_t len) {
-    if (Update.write(data, len) != len) {
+    if (Update.write(const_cast<uint8_t *>(data), len) != len) {
         Update.printError(Serial);
         return false;
     }

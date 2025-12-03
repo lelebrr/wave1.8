@@ -587,9 +587,9 @@ static void eye_left_event_cb(lv_event_t *e) {
         eye_left_press_start = lv_tick_get();
         eye_left_longpress_flag = false;
     } else if (code == LV_EVENT_PRESSING) {
-        if (eye_left_pressed &amp;&amp; !eye_left_longpress_flag) {
+        if (eye_left_pressed && !eye_left_longpress_flag) {
             uint32_t now = lv_tick_get();
-            if (now - eye_left_press_start &gt;= 5000) {
+            if (now - eye_left_press_start >= 5000) {
                 eye_left_longpress_flag = true;
             }
         }
