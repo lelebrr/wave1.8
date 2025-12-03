@@ -31,12 +31,18 @@ public:
     void begin();
     void update();
 
-    // Stats
+    // Stats básicos
     uint32_t uptime = 0;
     uint32_t aps_seen = 0;
     uint32_t handshakes = 0;
     uint32_t pmkids = 0;
     uint32_t deauths = 0;
+
+    // Estado de ambiente para NEURA9
+    float    battery_percent = 100.0f;
+    bool     is_charging     = false;
+    bool     is_moving       = false;
+    uint8_t  current_channel = 0;
 
 private:
     LGFX lcd;
