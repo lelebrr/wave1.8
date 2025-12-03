@@ -291,7 +291,8 @@ estritamente defensivo:
 
 - Este módulo é de **SIMULAÇÃO**, não de ataque real.
 - Tudo está **DESATIVADO por padrão**.
-- Só “liga” se você criar manualmente `/sd/.enable_lab_attacks`.
+- Só “liga” se você criar manualmente `/sd/.enable_lab_attacks` **e**
+  desbloquear o PIN de 6 dígitos da sessão atual pelo painel web.
 - Uso sem autorização formal pode ser **crime** em vários países.
 - O autor do projeto não se responsabiliza por uso indevido.
 - Você, operador, é o único responsável pelas ações realizadas.
@@ -301,8 +302,89 @@ controlado, com autorização formal:
 
 > Então, e somente então, crie o arquivo  
 > `/sd/.enable_lab_attacks`  
+> desbloqueie o PIN de laboratório no painel web  
 > e use as simulações de forma ética, responsável e legal.
 
 Caso contrário:
 
 > **NÃO HABILITE O MODO LABORATÓRIO.**
+
+---
+
+## 13. SIMULAÇÕES DISPONÍVEIS — ETAPA 9 FINAL
+
+Todas as simulações abaixo seguem os princípios deste documento:
+
+- **Nenhum** frame 802.11 malicioso real é enviado.
+- **Nenhum** AP falso real é criado.
+- **Nenhuma** interferência real em Bluetooth é gerada.
+- Todos os cenários são **sintéticos** e destinados a fins didáticos.
+
+### 13.1 Wi‑Fi (simulações acadêmicas)
+
+- **Wi‑Fi Deauth Burst (simulado)**  
+  Representa um cenário de muitos quadros de desautenticação, sem enviar
+  tráfego real. Útil para treinar alarmes e dashboards.
+
+- **Evil Twin + Captive Portal (simulado)**  
+  Modela a ideia de um AP falso que imita um SSID legítimo, sem criar AP
+  real. Pode ser usado para demonstrar riscos de redes abertas.
+
+- **Beacon Spam (500+ APs/s — simulado)**  
+  Simula um ambiente saturado de beacons falsos em logs e UI, sem frames.
+
+- **PMKID Flood (simulado)**  
+  Representa, em logs, vários pedidos/respostas de PMKID sem tráfego real.
+
+- **WPS PIN Brute-force (simulado)**  
+  Cenário sintético de tentativa de diversos PINs WPS, apenas em logs.
+  Não há brute-force real nem envio de pacotes WPS.
+
+- **Karma + MANA Attack (simulado)**  
+  Modela respostas artificiais a probes genéricos em ambiente sintético,
+  ajudando a entender o risco de redes que aceitam qualquer SSID.
+
+- **WPA3 → WPA2 Downgrade (simulado)**  
+  Representa o conceito de forçar clientes a negociar em WPA2 para estudo
+  acadêmico, sem alterar realmente a cifra ou negociações reais.
+
+### 13.2 Bluetooth (simulações acadêmicas)
+
+- **Bluetooth Name Spam (simulado)**  
+  Cenário técnico em que muitos nomes/identificadores são registrados em
+  logs, sem anúncios BLE reais.
+
+- **Bluetooth Jammer Full Band (simulado)**  
+  Simula saturação de espectro em logs e UI, sem gerar interferência real.
+
+- **Bluetooth Inquiry Flood (simulado)**  
+  Representa muitas consultas de descoberta em um curto período, apenas
+  em registros, sem inquiries reais.
+
+- **Bluetooth HID Injection (teclado — simulado)**  
+  Cenário em que um payload de teclado fictício é logado para fins
+  didáticos, sem criar teclados ou enviar comandos reais.
+
+### 13.3 Integração com Gemini AI (opcional)
+
+- **API Gemini integrada (análise de logs, handshakes, etc.)**  
+  Quando configurada em `/config/gemini_key.txt`, permite enviar resumos
+  de logs e cenários simulados para o modelo Gemini, com o objetivo de:
+
+  - Redigir explicações em linguagem natural.
+  - Ajudar na análise de relatórios.
+  - Apoiar aulas e workshops.
+
+  Evite enviar payloads completos, dados pessoais ou identificadores
+  sensíveis (MACs, nomes reais, etc.) para serviços externos.
+
+---
+
+TODAS as simulações são protegidas por:
+
+- Arquivo de guarda: `/sd/.enable_lab_attacks`; **e**
+- PIN de 6 dígitos desbloqueado na sessão atual pelo painel web.
+
+Sem esses dois fatores combinados, todas as funções de `SimulationManager`
+permanecem bloqueadas e apenas registram que o modo laboratório está
+desativado.
