@@ -1,0 +1,8 @@
+Placeholder NEURA9 defense model.
+
+Substitua este arquivo por um .tflite real gerado a partir do script
+ai/neura9_trainer.py ou de uma plataforma como Edge Impulse.
+
+Este arquivo não é usado diretamente pelo firmware — o build utiliza o
+array C definido em neura9_defense_model_data.cpp — mas mantê-lo aqui
+ajuda a documentar e versionar o modelo original.

@@ -11,6 +11,7 @@
 #include "sensors.h"
 #include "audio.h"
 #include "capture.h"
+#include "ai/neura9_inference.h"
 
 // -----------------------------------------------------------------------------
 // Implementação mínima do wrapper LGFX (por enquanto, apenas loga no Serial).
@@ -71,6 +72,12 @@ void Pwnagotchi::begin() {
 
     lv_init();
     ui_init();
+
+    // Inicializa IA defensiva local (NEURA9)
+    if (!neura9.begin()) {
+        Serial.println("[NEURA9] Falha ao inicializar IA defensiva (modo stub)");
+    }
+
     Serial.println("WAVE PWN PRONTO PARA DOMINAR");
 }
 
@@ -78,17 +85,34 @@ void Pwnagotchi::update() {
     // Uptimes simples em segundos (aprox.)
     uptime = millis() / 1000;
 
-    // Por enquanto usamos valores fictícios; nas próximas etapas estes virão
-    // do sniffer Wi-Fi, IMU e monitoramento de bateria real.
+    // Placeholders de ambiente (até integrar sensores reais)
+    current_channel  = 0;
+    battery_percent  = 100.0f;
+    is_charging      = false;
+    is_moving        = false;
+
     ui_update_stats(
         aps_seen,
         handshakes,
         pmkids,
         deauths,
-        0,          // canal atual (placeholder)
-        100.0f,     // bateria em % (placeholder)
-        false       // movimento detectado (placeholder)
+        current_channel,
+        battery_percent,
+        is_moving
     );
+
+    // NEURA9 avalia o ambiente periodicamente
+    static uint32_t last_ai = 0;
+    uint32_t now = millis();
+    if (now - last_ai > 800) {
+        uint8_t cls = neura9.predict();
+        float conf  = neura9.get_confidence();
+        (void)cls;
+        (void)conf;
+        // Futuro: exibir classe/confiança na HUD; por enquanto apenas log.
+        Serial.printf("[NEURA9] classe=%u conf=%.2f\n", cls, conf);
+        last_ai = now;
+    }
 
     // Deixa o LVGL rodar a UI
     lv_timer_handler();
