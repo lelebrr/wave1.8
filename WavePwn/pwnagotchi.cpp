@@ -1,4 +1,8 @@
 #include <Arduino.h>
+#include <WiFi.h>
+#include <SD.h>
+#include <esp_wifi.h>
+
 #include "pwnagotchi.h"
 #include "ui.h"
 #include "config.h"
@@ -6,6 +10,7 @@
 #include "wifi_sniffer.h"
 #include "sensors.h"
 #include "audio.h"
+#include "capture.h"
 
 // -----------------------------------------------------------------------------
 // Implementação mínima do wrapper LGFX (por enquanto, apenas loga no Serial).
@@ -50,9 +55,20 @@ void LGFX::setBrightness(uint8_t value) {
 void Pwnagotchi::begin() {
     initDisplay();
     showBootAnimation();
+
     initSD();
+    capture_init();
+
     initSensors();
     initWiFiMonitor();
+
+    // Callback promíscuo -> motor de captura de handshakes/PMKID
+    esp_wifi_set_promiscuous_rx_cb([](void* buf, wifi_promiscuous_pkt_type_t type) {
+        (void)type;
+        wifi_promiscuous_pkt_t* pkt = (wifi_promiscuous_pkt_t*)buf;
+        capture_packet_handler((uint8_t*)pkt, pkt->rx_ctrl.sig_len, pkt->rx_ctrl.channel);
+    });
+
     lv_init();
     ui_init();
     Serial.println("WAVE PWN PRONTO PARA DOMINAR");
@@ -88,13 +104,41 @@ void Pwnagotchi::initDisplay() {
 }
 
 void Pwnagotchi::initSD() {
-    // Futuro: montar microSD, criar pastas de PCAPs, logs, configs, etc.
-    Serial.println("[WavePwn] initSD() - stub inicial");
+    Serial.println("[WavePwn] initSD() - inicializando microSD...");
+
+    if (!SD.begin()) {
+        Serial.println("[WavePwn] Falha ao inicializar o microSD");
+        return;
+    }
+
+    // Estrutura definitiva de pastas
+    SD.mkdir("/sd");
+    SD.mkdir("/sd/wavepwn");
+    SD.mkdir("/sd/wavepwn/handshakes");
+    SD.mkdir("/sd/wavepwn/pmkid");
+    SD.mkdir("/sd/wavepwn/sae");
+    SD.mkdir("/sd/wavepwn/logs");
+    SD.mkdir("/sd/wavepwn/session");
+
+    Serial.println("[WavePwn] microSD pronto para captura de handshakes");
 }
 
 void Pwnagotchi::initWiFiMonitor() {
-    // Futuro: inicializar esp_wifi em modo promíscuo + ESP32Marauder helpers.
-    Serial.println("[WavePwn] initWiFiMonitor() - stub inicial");
+    Serial.println("[WavePwn] initWiFiMonitor() - configurando Wi-Fi em modo promíscuo");
+
+    WiFi.mode(WIFI_MODE_STA);
+    WiFi.disconnect(true, true);
+
+    // Filtro: apenas management + data (onde estão beacons, probe resp, EAPOL, etc.)
+    wifi_promiscuous_filter_t filter = {};
+    filter.filter_mask = WIFI_PROMIS_FILTER_MASK_MGMT | WIFI_PROMIS_FILTER_MASK_DATA;
+    esp_wifi_set_promiscuous_filter(&filter);
+
+    // Canal inicial (primeiro da lista configurada)
+    esp_wifi_set_channel(WIFI_CHANNELS[0], WIFI_SECOND_CHAN_NONE);
+
+    // Ativa modo promíscuo
+    esp_wifi_set_promiscuous(true);
 }
 
 void Pwnagotchi::initSensors() {
